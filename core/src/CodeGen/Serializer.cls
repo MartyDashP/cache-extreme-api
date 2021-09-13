@@ -1,16 +1,20 @@
-Class ExtremeAPI.CodeGenerator Extends %RegisteredObject
+Include ExtremeAPI.general
+
+Class ExtremeAPI.CodeGen.Serializer Extends %RegisteredObject
 {
 
-ClassMethod GenerateSerializer() As %Status
+Parameter SerializerClassName = {..%ClassName(1)};
+
+ClassMethod Generate() As %Status
 {
 	#dim %code as %Stream.MethodGenerator
 	#dim %compiledclass as %Dictionary.CompiledClass
-		
-	d ##class(ExtremeAPI.CommonUtil).CollectClassProperties(.properties, %compiledclass)
-	
-	s argCounter = 0
-	
-	f {
+
+    $$$CollectSortedClassProperties(.properties, %compiledclass)
+
+    s argCounter = 0
+
+    f {
 		s key = $order(properties(key))
 	 	q:key=""
 	 	
@@ -23,15 +27,15 @@ ClassMethod GenerateSerializer() As %Status
 	 	
 	 	s serializeCode = ..GetTypeSerializationCode(property)
 	 	
-	 	if ##class(ExtremeAPI.CommonUtil).IsCollectionProperty(property)
+	 	if $$$IsCollectionProperty(property)
 	 	{
 		 	d %code.WriteLine("	if m%"_property.Name_" { s "_arg_" = "_serializeCode_" }")
 	 	}
-	 	elseif ##class(ExtremeAPI.CommonUtil).IsObject(property)
+	 	elseif $$$IsSupportedObjectTypeProperty(property)
 	 	{
 		 	d %code.WriteLine("	if $ISOBJECT(.."_property.Name_") { s "_arg_" = "_serializeCode_" }")
 	 	}
-	 	elseif ##class(ExtremeAPI.CommonUtil).IsDataTypeProperty(property)
+	 	elseif $$$IsDataTypeProperty(property)
 	 	{
 		 	d %code.WriteLine("	if (i%"_property.Name_" '= """") { s "_arg_" = "_serializeCode_" }")
 	 	}
@@ -44,18 +48,18 @@ ClassMethod GenerateSerializer() As %Status
 
 ClassMethod GetTypeSerializationCode(property As %Dictionary.CompiledProperty) As %String
 {
-	if ##class(ExtremeAPI.CommonUtil).IsCollectionProperty(property)
+	if $$$IsCollectionProperty(property)
 	{
 		s args = args _ $lb("""SerializeCollectionList""")
 	}
 	
 	s compiledClass = ##class(%Dictionary.CompiledClass).%OpenId(property.Type)
 	
-	if ##class(ExtremeAPI.CommonUtil).IsObject(property)
+	if $$$IsSupportedObjectTypeProperty(property)
 	{
 		s args = args _ $lb("""SerializeObject""")
 	} 
-	elseif ##class(ExtremeAPI.CommonUtil).IsDataTypeProperty(property)
+	elseif $$$IsDataTypeProperty(property)
 	{
 		s serializeMethodName = $case(property.Type,
 			"%Library.String": "SerializeString",
@@ -76,38 +80,49 @@ ClassMethod GetTypeSerializationCode(property As %Dictionary.CompiledProperty) A
 	
 	s args = args _ $lb(".."_property.Name)
 	
-	ret "##class(""ExtremeAPI.Converter"").%Call("_$lts(args)_")"
+	ret "##class("""_..#SerializerClassName_""").%Call("_$lts(args)_")"
 }
 
-ClassMethod GenerateDeserializer() As %Status
+ClassMethod %Call(methodName As %String, args...)
 {
-	#dim %code as %Stream.MethodGenerator
-	#dim %compiledclass as %Dictionary.CompiledClass
-	
-	d %code.WriteLine("	s xepBoostObj = ..%New()")
+	ret $classmethod(..%ClassName(1), methodName, args...)
+}
+
+ClassMethod SerializeString(val) [ Internal ]
+{
+	ret val
+}
+
+ClassMethod SerializeNum(val) [ Internal ]
+{
+	ret +val
+}
+
+ClassMethod SerializeObject(val As ExtremeAPI.AbstractDTO) [ Internal ]
+{
+	ret val.%eapiSerializeDTO()
+}
+
+ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collection.AbstractList) [ Internal ]
+{
+	f
+	{
+		s collectionItem = list.GetNext(.key)
+		q:key=""
 		
-	d ##class(ExtremeAPI.CommonUtil).CollectClassProperties(.properties, %compiledclass)
-	
-	s argCounter = 0
-	
-	f {
-		s key = $order(properties(key))
-	 	q:key=""
-	 	
-	 	s argCounter = argCounter + 1
-	 	
-	 	d %code.WriteLine("	if $ld(serializedValue,"_argCounter_") {")
-	 	
-	 	s arg = "arg"_argCounter
-	 	s args = args _ $lb(arg)
-	 	
-	 	#dim property as %Dictionary.CompiledProperty
-	 	s property = properties(key)
-	}
-	
-	d %code.WriteLine("	ret xepBoostObj")
+		k serializedValue
 		
-	ret $$$OK
+		if (itemSerializer = "SerializeString" || collectionItem '= "") 
+		{
+			s serializedValue = ..%Call(itemSerializer, collectionItem)
+		}
+		
+		s serializedCollection = serializedCollection _ $lb(serializedValue) 
+	}	
+
+	s:(serializedCollection = "") serializedCollection = $lb()
+	ret serializedCollection
 }
 
 }
+
