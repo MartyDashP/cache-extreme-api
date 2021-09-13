@@ -56,5 +56,11 @@ ClassMethod IsDataTypeProperty(property As %Dictionary.CompiledProperty) As %Boo
 	ret ..IsExtendClass(compiledClass, "%Library.DataType")
 }
 
+ClassMethod NormalizeClassName(className As %String) As %String
+{
+	$$$TOE(sc,$$NormalizeClassnameByCom^%occName(.result,className))
+	ret result
+}
+
 }
 

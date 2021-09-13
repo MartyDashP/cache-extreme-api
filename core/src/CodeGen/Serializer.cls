@@ -69,10 +69,7 @@ ClassMethod GetTypeSerializationCode(property As %Dictionary.CompiledProperty) A
 			
 		if (serializeMethodName = "")
 		{
-			throw ##class(%Exception.General).%New(
-				"Unsupported serialization type",
-				"XEP_BOOST_UNSUPPORTED_TYPE",
-				"Type '"_property.Type_"' in unsupported for xep boost serialization")
+            $$$ThrowException("Type '"_property.Type_"' is unsupported for Extreme API serialization")
 		}
 		
 		s args = args _ $lb(""""_serializeMethodName_"""")
@@ -100,7 +97,7 @@ ClassMethod SerializeNum(val) [ Internal ]
 
 ClassMethod SerializeObject(val As ExtremeAPI.AbstractDTO) [ Internal ]
 {
-	ret val.%eapiSerializeDTO()
+	ret val.%serializeExtremeApiDTO()
 }
 
 ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collection.AbstractList) [ Internal ]
