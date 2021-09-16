@@ -36,13 +36,12 @@ ClassMethod GetCompiledClass(className As %String) As %Dictionary.CompiledClass
 ClassMethod IsExtendClass(comClass As %Dictionary.CompiledClass, superClassName As %String) As %Boolean
 {
 	s superClasses = $lfs(comClass.PrimarySuper, "~")
-	ret $lf(superClasses, superClassName)
+	ret $lf(superClasses, superClassName) > 0
 }
 
 ClassMethod IsSupportedObjectTypeProperty(property As %Dictionary.CompiledProperty) As %Boolean
 {
-	s compiledClass = ..GetCompiledClass(property.Type)
-	ret ..IsExtendClass(compiledClass, ..#BasicSupportedObjectClassName)
+	ret ..IsSupportedObjectType(property.Type)
 }
 
 ClassMethod IsCollectionProperty(property As %Dictionary.CompiledProperty) As %Boolean
@@ -50,10 +49,37 @@ ClassMethod IsCollectionProperty(property As %Dictionary.CompiledProperty) As %B
 	ret (property.Collection '= "")
 }
 
+ClassMethod IsCollectionAsList(className As %String) As %Boolean
+{
+	s supportedCollections = $lb(
+		##class(%ListOfDataTypes).%ClassName(1),
+		##class(%ListOfObjects).%ClassName(1),
+		##class(%Collection.ListOfObj).%ClassName(1),
+		##class(%Collection.ListOfDT).%ClassName(1))
+		
+	ret ($lf(supportedCollections,className) > 0)
+}
+
 ClassMethod IsDataTypeProperty(property As %Dictionary.CompiledProperty) As %Boolean
 {
-	s compiledClass = ..GetCompiledClass(property.Type)
+	ret ..IsDataType(property.Type)
+}
+
+ClassMethod IsSupportedObjectType(className As %String) As %Boolean
+{
+	s compiledClass = ..GetCompiledClass(className)
+	ret ..IsExtendClass(compiledClass, ..#BasicSupportedObjectClassName)
+}
+
+ClassMethod IsDataType(typeName As %String) As %Boolean
+{
+	s compiledClass = ..GetCompiledClass(typeName)
 	ret ..IsExtendClass(compiledClass, "%Library.DataType")
+}
+
+ClassMethod IsListType(typeName As %String) As %Boolean
+{
+	ret (typeName = "%Library.List")
 }
 
 ClassMethod NormalizeClassName(className As %String) As %String

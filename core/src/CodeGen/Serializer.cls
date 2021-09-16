@@ -12,70 +12,84 @@ ClassMethod Generate() As %Status
 
     $$$CollectSortedClassProperties(.properties, %compiledclass)
 
-    s argCounter = 0
-
     f {
 		s key = $order(properties(key))
 	 	q:key=""
 	 	
-	 	s argCounter = argCounter + 1
-	 	s arg = "arg"_argCounter
-	 	s args = args _ $lb(arg)
-	 	
 	 	#dim property as %Dictionary.CompiledProperty
 	 	s property = properties(key)
 	 	
-	 	s serializeCode = ..GetTypeSerializationCode(property)
+	 	s targetParam = "s0"_property.Name
+	 	s targetParams = targetParams _ $lb(targetParam)
 	 	
+	 	s sourceParam = property.Name
+	 	s sourceType = property.Type
+
 	 	if $$$IsCollectionProperty(property)
 	 	{
-		 	d %code.WriteLine("	if m%"_property.Name_" { s "_arg_" = "_serializeCode_" }")
+		 	s condition = "m%"_sourceParam
 	 	}
 	 	elseif $$$IsSupportedObjectTypeProperty(property)
 	 	{
-		 	d %code.WriteLine("	if $ISOBJECT(.."_property.Name_") { s "_arg_" = "_serializeCode_" }")
+		 	s condition = "$ISOBJECT(.."_sourceParam_")"
 	 	}
-	 	elseif $$$IsDataTypeProperty(property)
+	 	elseif ($$$IsDataTypeProperty(property) || $$$IsListType(sourceType))
 	 	{
-		 	d %code.WriteLine("	if (i%"_property.Name_" '= """") { s "_arg_" = "_serializeCode_" }")
+		 	s condition = "(i%"_sourceParam_" '= """")"
 	 	}
+
+	 	s codeBlock = ..GetBlockCode(condition, targetParam, sourceParam, sourceType, $$$IsCollectionProperty(property))
+	 	d %code.WriteLine(codeBlock)
  	}
  	
-	d %code.Write("	ret $lb("_$lts(args)_")")
+	d %code.WriteLine("	ret $lb("_$lts(targetVars)_")")
  	
  	ret $$$OK
 }
 
-ClassMethod GetTypeSerializationCode(property As %Dictionary.CompiledProperty) As %String
+ClassMethod GetBlockCode(condition As %String, target As %String, source As %String, type As %String, isCollection As %Boolean)
 {
-	if $$$IsCollectionProperty(property)
+	s cb = "	if "_condition_" { "
+	s cb = cb_"s "_target_" = "_..GetSerializationBlockCode(source, type, isCollection)
+	s cb = cb_" }"
+	
+	ret cb
+}
+
+ClassMethod GetSerializationBlockCode(name As %String, type As %String, isCollection As %Boolean) As %String
+{
+	if isCollection
 	{
-		s args = args _ $lb("""SerializeCollectionList""")
+		s args = args _ $lb($$$Wrap($$$GetMethodName(..SerializeCollectionList)))
 	}
 	
-	s compiledClass = ##class(%Dictionary.CompiledClass).%OpenId(property.Type)
+	s compiledClass = $$$GetCompiledClass(type)
 	
-	if $$$IsSupportedObjectTypeProperty(property)
+	if $$$IsSupportedObjectType(type)
 	{
-		s args = args _ $lb("""SerializeObject""")
+		s args = args _ $lb($$$Wrap($$$GetMethodName(..SerializeObject)))
 	} 
-	elseif $$$IsDataTypeProperty(property)
+	elseif $$$IsListType(type)
 	{
-		s serializeMethodName = $case(property.Type,
-			"%Library.String": "SerializeString",
-			"%Library.Integer": "SerializeNum",
-			"%Library.Numeric": "SerializeNum", 
+		s args = args_$lb($$$Wrap($$$GetMethodName(..SerializeList)))
+	}
+	elseif $$$IsDataType(type)
+	{
+		s serializeMethodName = $case(type,
+			"%Library.String": $$$GetMethodName(..SerializeString),
+			"%Library.Integer": $$$GetMethodName(..SerializeNum),
+			"%Library.Numeric": $$$GetMethodName(..SerializeNum), 
 			: "")
 			
 		if (serializeMethodName = "")
 		{
-            $$$ThrowException("Type '"_property.Type_"' is unsupported for Extreme API serialization")
+            $$$ThrowException("Type '"_type_"' is unsupported for Extreme API serialization")
 		}
 		
-		s args = args _ $lb(""""_serializeMethodName_"""")
+		s args = args _ $lb($$$Wrap(serializeMethodName))
 	}
 	
-	s args = args _ $lb(".."_property.Name)
+	s args = args _ $lb(".."_name)
 	
 	ret "##class("""_..#SerializerClassName_""").%Call("_$lts(args)_")"
 }
@@ -83,6 +97,11 @@ ClassMethod GetTypeSerializationCode(property As %Dictionary.CompiledProperty) A
 ClassMethod %Call(methodName As %String, args...)
 {
 	ret $classmethod(..%ClassName(1), methodName, args...)
+}
+
+ClassMethod SerializeList(val) [ Internal ]
+{
+	ret val
 }
 
 ClassMethod SerializeString(val) [ Internal ]
@@ -97,7 +116,7 @@ ClassMethod SerializeNum(val) [ Internal ]
 
 ClassMethod SerializeObject(val As ExtremeAPI.AbstractDTO) [ Internal ]
 {
-	ret val.%serializeExtremeApiDTO()
+	ret val.%SerializeExtremeApiDTO()
 }
 
 ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collection.AbstractList) [ Internal ]
