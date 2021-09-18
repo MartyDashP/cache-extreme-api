@@ -37,8 +37,12 @@ ClassMethod Generate() As %Status
 	 	{
 		 	s condition = "(i%"_sourceParam_" '= """")"
 	 	}
+	 	else
+		{
+			$$$ThrowException("Extreme API unsupported type '"_type_"'")
+		}
 
-	 	s codeBlock = ..GetBlockCode(condition, targetParam, sourceParam, sourceType, $$$IsCollectionProperty(property))
+	 	s codeBlock = ..GetBlockCode(condition, targetParam, ".."_sourceParam, sourceType, $$$IsCollectionProperty(property))
 	 	d %code.WriteLine(codeBlock)
  	}
  	
@@ -83,13 +87,17 @@ ClassMethod GetSerializationBlockCode(name As %String, type As %String, isCollec
 			
 		if (serializeMethodName = "")
 		{
-            $$$ThrowException("Type '"_type_"' is unsupported for Extreme API serialization")
+            $$$ThrowException("Extreme API unsupported type '"_type_"'")
 		}
 		
 		s args = args _ $lb($$$Wrap(serializeMethodName))
 	}
+	else
+	{
+		$$$ThrowException("Extreme API unsupported type '"_type_"'")
+	}
 	
-	s args = args _ $lb(".."_name)
+	s args = args _ $lb(name)
 	
 	ret "##class("""_..#SerializerClassName_""").%Call("_$lts(args)_")"
 }

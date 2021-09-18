@@ -9,27 +9,24 @@ ClassMethod Generate() As %Status
 {
 	$$$CollectSortedClassProperties(.properties, %compiledclass)
 	
-	s counter = 0
 	s dObjName = "dObj"
 	s sObjName = "sObj"
 	
 	d %code.WriteLine("	s "_dObjName_" = ..%New()")
 	
-	f {
+	f i=1:1 {
 		s key = $order(properties(key))
 	 	q:key=""
 	 	
 	 	#dim property as %Dictionary.CompiledProperty
 	 	s property = properties(key)
 	 	
-	 	s counter = counter + 1
-	 	
 	 	s propertyName = property.Name
 	 	s propertyType = property.Type
 	 	s collectionType = ""
 		s:$$$IsCollectionProperty(property) collectionType = property.RuntimeType
 		
-		s source = "$lg("_sObjName_","_counter_")"
+		s source = "$lg("_sObjName_","_i_")"
 	 	s target = dObjName_"."_propertyName
 	 	
 	 	d %code.WriteLine(..GetBlockCode(source, target, propertyType, collectionType))

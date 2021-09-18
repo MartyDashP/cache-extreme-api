@@ -1,4 +1,4 @@
-Class ExtremeAPI.AbstractDTO Extends %RegisteredObject [ Abstract, CompileAfter = ExtremeAPI.CodeGen.Serializer ]
+Class ExtremeAPI.AbstractDTO Extends %RegisteredObject [ Abstract, CompileAfter = (ExtremeAPI.CodeGen.Deserializer, ExtremeAPI.CodeGen.Serializer) ]
 {
 
 Method %SerializeExtremeApiDTO() [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
