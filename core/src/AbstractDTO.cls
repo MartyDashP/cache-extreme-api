@@ -7,7 +7,7 @@ Method %SerializeExtremeApiDTO() [ CodeMode = objectgenerator, Internal, ServerO
  	ret sc
 }
 
-Method %DeserializeExtremeApiDTO(sObj As %List) [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
+ClassMethod %DeserializeExtremeApiDTO(sObj As %List) [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
 {
 	$$$TOE(sc,##class(ExtremeAPI.CodeGen.Deserializer).Generate())
  	ret sc

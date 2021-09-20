@@ -46,7 +46,7 @@ ClassMethod Generate() As %Status
 	 	d %code.WriteLine(codeBlock)
  	}
  	
-	d %code.WriteLine("	ret $lb("_$lts(targetVars)_")")
+	d %code.WriteLine("	ret $lb("_$lts(targetParams)_")")
  	
  	ret $$$OK
 }
@@ -99,7 +99,7 @@ ClassMethod GetSerializationBlockCode(name As %String, type As %String, isCollec
 	
 	s args = args _ $lb(name)
 	
-	ret "##class("""_..#SerializerClassName_""").%Call("_$lts(args)_")"
+	ret "##class("_..#SerializerClassName_").%Call("_$lts(args)_")"
 }
 
 ClassMethod %Call(methodName As %String, args...)

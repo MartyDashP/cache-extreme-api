@@ -52,6 +52,18 @@ ClassMethod GetDeserializationBlockCode(varName As %String, type As %String, col
 
 	if (collectionType '= "")
 	{
+		s collectionType = $case(collectionType, 
+			"%Collection.ListOfDT": ##class(%Library.ListOfDataTypes).%ClassName(1),
+			##class(%Library.ListOfDataTypes).%ClassName(1): ##class(%Library.ListOfDataTypes).%ClassName(1),
+			"%Collection.ListOfObj": ##class(%Library.ListOfObjects).%ClassName(1),
+			##class(%Library.ListOfObjects).%ClassName(1): ##class(%Library.ListOfObjects).%ClassName(1),
+			:"")
+			
+		if (collectionType = "")
+		{
+            $$$ThrowException("Extreme API unsupported collection type '"_type_"'")
+		}
+		
 		s args = args_$lb($$$Wrap($$$GetMethodName(..DeserializeCollection)), $$$Wrap(collectionType))
 	}
 	
@@ -83,7 +95,7 @@ ClassMethod GetDeserializationBlockCode(varName As %String, type As %String, col
 		$$$ThrowException("Extreme API unsupported type '"_type_"'")
 	}
 	
-	ret "##class("""_..#DeserializerClassName_""").%Call("_$lts(args)_")"
+	ret "##class("_..#DeserializerClassName_").%Call("_$lts(args)_")"
 }
 
 ClassMethod %Call(val, methodName As %String, args...)
@@ -98,12 +110,14 @@ ClassMethod DeserializePrimitive(val) [ Internal ]
 
 ClassMethod DeserializeObject(val As ExtremeAPI.AbstractDTO, className As %String) [ Internal ]
 {
-	ret $classmethod(className,val)
+	ret $classmethod(className, "%DeserializeExtremeApiDTO", val)
 }
 
 ClassMethod DeserializeCollection(val As %List, collectionClassName As %String, itemDeserializer As %String, args...) As %ListOfObjects [ Internal ]
 {
 	s resultList = $classmethod(collectionClassName,"%New")
+	
+	s col = ##class(%Collection.ListOfDT).%New()
 	
 	f i=1:1:$ll(val)
 	{
