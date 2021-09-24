@@ -1,9 +1,7 @@
 Include ExtremeAPI.general
 
-Class ExtremeAPI.CodeGen.Controller Extends %Projection.AbstractProjection [ Abstract, CompileAfter = (ExtremeAPI.CodeGen.Deserializer, ExtremeAPI.CodeGen.Serializer) ]
+Class ExtremeAPI.CodeGen.Controller Extends %RegisteredObject
 {
-
-Parameter ROOTPACKAGENAME;
 
 Parameter DeserializerClassName = {##class(ExtremeAPI.CodeGen.Deserializer).%ClassName(1)};
 
@@ -13,32 +11,23 @@ Parameter SerializedPrefix = "s0";
 
 Parameter DeserializedPrefix = "d0";
 
-ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, modified As %String, qstruct) As %Status
+ClassMethod Generate(compClass As %Dictionary.CompiledClass, controllerClassName As %String) As %Status
 {
-	#dim compClass as %Dictionary.CompiledClass
-	s compClass = $$$GetCompiledClass(classname)
+	if (controllerClassName = "")
+	{
+		$$$ThrowException("ControllerClassName is undefined")
+	}
 	
 	ret:(compClass.Abstract = 1) $$$OK
 	
-	s rootPackageName = ..GetRootPackageName(.parameters)
-	if (rootPackageName = "")
-	{
-		$$$ThrowException("Root package for controller projection is undefined")
-	}
+
+    s controller = ..GetClassDefinition(controllerClassName, compClass)
+	$$$TOE(sc,controller.%Save())
 	
-	s projectionName = ..GetProjectionName(rootPackageName, compClass.Name)
-    s projection = ..GetClassDefinition(projectionName, compClass)
-	$$$TOE(sc,projection.%Save())
-	
-	ret $system.OBJ.Compile(projection.Name,"b-r/checkuptodate")
+	ret $system.OBJ.Compile(controller.Name,"b-r/checkuptodate")
 }
 
-ClassMethod GetRootPackageName(ByRef parameters) As %String
-{
-	ret $g(parameters("ROOTPACKAGENAME"))
-}
-
-ClassMethod GetProjectionName(rootPackageName As %String, sourceClassName As %String) As %String
+ClassMethod GetControllerClassName(rootPackageName As %String, sourceClassName As %String) As %String
 {
     ret rootPackageName_"."_sourceClassName
 }
@@ -53,18 +42,6 @@ ClassMethod GetClassDefinition(className As %String, comClass As %Dictionary.Com
 	s class.Methods = ..GenerateClassMethods(class, comClass)
 	
     ret class
-}
-
-ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
-{
-	s rootPackageName = ..GetRootPackageName(.parameters)
-	
-	if (rootPackageName '= "")
-	{
-		ret $$Delete^%apiOBJ(..GetProjectionName(rootPackageName, classname),"-d",,1)
-	}
-	
-	ret $$$OK
 }
 
 ClassMethod GenerateClassMethods(parent As %Dictionary.ClassDefinition, comClass As %Dictionary.CompiledClass) As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefinition")
