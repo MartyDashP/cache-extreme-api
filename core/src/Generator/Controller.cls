@@ -1,11 +1,11 @@
 Include ExtremeAPI.general
 
-Class ExtremeAPI.CodeGen.Controller Extends %RegisteredObject
+Class ExtremeAPI.Generator.Controller Extends %RegisteredObject
 {
 
-Parameter DeserializerClassName = {##class(ExtremeAPI.CodeGen.Deserializer).%ClassName(1)};
+Parameter DeserializerClassName = {##class(ExtremeAPI.Generator.Deserializer).%ClassName(1)};
 
-Parameter SerializerClassName = {##class(ExtremeAPI.CodeGen.Serializer).%ClassName(1)};
+Parameter SerializerClassName = {##class(ExtremeAPI.Generator.Serializer).%ClassName(1)};
 
 Parameter SerializedPrefix = "s0";
 
@@ -136,7 +136,7 @@ ClassMethod GenerateClassMethod(cMethod As %Dictionary.CompiledMethod) As %Dicti
 		d method.Implementation.WriteLine("	s "_dResultVar_" = "_callControllerMethod)
 		
 		s condition = "("_dResultVar_" '= """")"
-		s codeBlock = ##class(ExtremeAPI.CodeGen.Serializer).GetBlockCode(condition,sResultVar,dResultVar,returnType,isCollection)
+		s codeBlock = ##class(ExtremeAPI.Generator.Serializer).GetBlockCode(condition,sResultVar,dResultVar,returnType,isCollection)
 		d method.Implementation.WriteLine(codeBlock)
 		d method.Implementation.WriteLine("	ret "_sResultVar)
 	}
@@ -179,7 +179,7 @@ ClassMethod ProcessArg(arg As %List, ByRef sourceArgs As %List, ByRef targetArgs
 		s targetType = $$$NormalizeClassName($tr($lg(arg,ptr+1),"""",""))
 	}
 	
-	ret ##class(ExtremeAPI.CodeGen.Deserializer).GetBlockCode(sourceName,targetName,targetType,collectionTargetType)
+	ret ##class(ExtremeAPI.Generator.Deserializer).GetBlockCode(sourceName,targetName,targetType,collectionTargetType)
 }
 
 }

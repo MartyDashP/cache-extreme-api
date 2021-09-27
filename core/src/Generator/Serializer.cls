@@ -1,6 +1,6 @@
 Include ExtremeAPI.general
 
-Class ExtremeAPI.CodeGen.Serializer Extends %RegisteredObject
+Class ExtremeAPI.Generator.Serializer Extends %RegisteredObject
 {
 
 Parameter SerializerClassName = {..%ClassName(1)};

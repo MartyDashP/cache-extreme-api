@@ -18,7 +18,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 	}
 	
 	s projectionName = ..GetProjectionName(rootPackageName, compClass.Name)
-	ret ##class(ExtremeAPI.CodeGen.Controller).Generate(compClass, projectionName)
+	ret ##class(ExtremeAPI.Generator.Controller).Generate(compClass, projectionName)
 }
 
 ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
