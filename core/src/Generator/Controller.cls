@@ -1,6 +1,6 @@
 Include ExtremeAPI.general
 
-Class ExtremeAPI.Generator.Controller Extends %RegisteredObject
+Class ExtremeAPI.Generator.Controller Extends %RegisteredObject [ CompileAfter = (ExtremeAPI.Generator.Deserializer, ExtremeAPI.Generator.Serializer) ]
 {
 
 Parameter DeserializerClassName = {##class(ExtremeAPI.Generator.Deserializer).%ClassName(1)};
@@ -11,6 +11,12 @@ Parameter SerializedPrefix = "s0";
 
 Parameter DeserializedPrefix = "d0";
 
+Property Controller As %Dictionary.ClassDefinition [ Private ];
+
+Property CompClass As %Dictionary.CompiledClass [ Private ];
+
+Property ControllerClassName As %String [ Private ];
+
 ClassMethod Generate(compClass As %Dictionary.CompiledClass, controllerClassName As %String) As %Status
 {
 	if (controllerClassName = "")
@@ -20,50 +26,51 @@ ClassMethod Generate(compClass As %Dictionary.CompiledClass, controllerClassName
 	
 	ret:(compClass.Abstract = 1) $$$OK
 	
-
-    s controller = ..GetClassDefinition(controllerClassName, compClass)
-	$$$TOE(sc,controller.%Save())
+	s generator = ..%New()
+	s generator.ControllerClassName = controllerClassName
+	s generator.CompClass = compClass
 	
-	ret $system.OBJ.Compile(controller.Name,"b-r/checkuptodate")
+	ret generator.CreateController()
 }
 
-ClassMethod GetControllerClassName(rootPackageName As %String, sourceClassName As %String) As %String
+Method CreateController()
 {
-    ret rootPackageName_"."_sourceClassName
-}
-
-ClassMethod GetClassDefinition(className As %String, comClass As %Dictionary.CompiledClass) As %Dictionary.ClassDefinition
-{
-    s class = ##class(%Dictionary.ClassDefinition).%New()
-	s class.Final = 1
-	s class.GeneratedBy = ..%ClassName(1)
-	s class.Name = className
-	s class.ProcedureBlock = 1
-	s class.Methods = ..GenerateClassMethods(class, comClass)
+	d ..GenerateClassDefinition()
 	
-    ret class
+	$$$TOE(sc, ..Controller.%Save())
+	ret $system.OBJ.Compile(..Controller.Name, "b-r/checkuptodate")
 }
 
-ClassMethod GenerateClassMethods(parent As %Dictionary.ClassDefinition, comClass As %Dictionary.CompiledClass) As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefinition")
+Method GenerateClassDefinition()
+{
+    s ..Controller = ##class(%Dictionary.ClassDefinition).%New()
+	s ..Controller.Final = 1
+	s ..Controller.GeneratedBy = ..%ClassName(1)
+	s ..Controller.Name = ..ControllerClassName
+	s ..Controller.ProcedureBlock = 1
+	s ..Controller.Methods = ..GetClassMethods()
+}
+
+Method GetClassMethods() As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefinition")
 {
 	s methods = ##class(%ListOfObjects).%New()
 	
 	f
 	{
 		#dim cMethod as %Dictionary.CompiledMethod
-		s cMethod = comClass.Methods.GetNext(.key)
+		s cMethod = ..CompClass.Methods.GetNext(.key)
 		q:key=""
 		
 		if ((cMethod.Private = 1) 
 		|| (cMethod.Internal = 1) 
-		|| (cMethod.Origin '= comClass.Name)
+		|| (cMethod.Origin '= ..CompClass.Name)
 		|| (cMethod.ClassMethod = 0) )
 		{
 			continue
 		}
 		
 		s method = ..GenerateClassMethod(cMethod)
-		s method.parent = parent
+		s method.parent = ..Controller
 		
 		$$$TOE(sc,methods.Insert(method))
 	}
@@ -71,115 +78,77 @@ ClassMethod GenerateClassMethods(parent As %Dictionary.ClassDefinition, comClass
 	ret methods
 }
 
-ClassMethod GenerateClassMethod(cMethod As %Dictionary.CompiledMethod) As %Dictionary.MethodDefinition
+Method GenerateClassMethod(cMethod As %Dictionary.CompiledMethod) As %Dictionary.MethodDefinition
 {
 	s method = ##class(%Dictionary.MethodDefinition).%New()
 	s method.Name = cMethod.Name
 	s method.Final = 1
 	s method.ClassMethod = 1
 	
-	s sourceArgs = ""
-	s targetArgs = ""
-	s args = cMethod.FormalSpecParsed
+	d ..ProcessMethodSpecs(cMethod, .methodImpl, .serializationSpecs, .deserializationSpecs)
+	d:(methodImpl '= "") method.Implementation.Write(methodImpl)
 		
-	f i=1:1:$ll(args) {
-		s arg = $lg(args,i)
-		s codeBlock = ..ProcessArg(arg, .sourceArgs, .targetArgs)
-		d method.Implementation.WriteLine(codeBlock)
-	}
-		
-	s method.FormalSpec = $lts(sourceArgs)
+	s method.FormalSpec = $lts(serializationSpecs)
 	
-	s returnType = cMethod.ReturnType
-	
-	if (returnType '= "")
-	{
-		s isCollection = $$$IsCollectionAsList(returnType)
-		
-		if ($$$IsDataType(returnType))
-		{
-			s method.ReturnType = returnType
-		}
-		else
-		{
-			s method.ReturnType = "%Library.List"
-		}
-	}
-		
-	if isCollection
-	{
-		if ($f(cMethod.ReturnTypeParams,"ELEMENTTYPE") = 0)
-		{
-			$$$ThrowException("return collection type must have parameter 'ELEMENTTYPE'")
-		}
-			
-		s returnType = $lg($lfs(cMethod.ReturnTypeParams,"="),2)
-			
-		if (returnType = "")
-		{
-			$$$ThrowException("return collection element type is undefined")
-		}
-			
-		s returnType = $$$NormalizeClassName($tr(returnType,"""",""))
-	}
-		
-	s callControllerMethod = "##class("_cMethod.Origin_")."_cMethod.Name_"("_$lts(targetArgs)_")"
-		
-	if (returnType = "")
-	{
-		d method.Implementation.WriteLine("	d "_callControllerMethod)
-	}
-	else
-	{
-		s dResultVar = ..#DeserializedPrefix_"result"
-		s sResultVar = ..#SerializedPrefix_"result"
-		d method.Implementation.WriteLine("	s "_dResultVar_" = "_callControllerMethod)
-		
-		s condition = "("_dResultVar_" '= """")"
-		s codeBlock = ##class(ExtremeAPI.Generator.Serializer).GetBlockCode(condition,sResultVar,dResultVar,returnType,isCollection)
-		d method.Implementation.WriteLine(codeBlock)
-		d method.Implementation.WriteLine("	ret "_sResultVar)
-	}
+	d ..ProcessMethodResult(cMethod,deserializationSpecs,.methodImpl,.returnType)
+	s:(returnType '= "") method.ReturnType = returnType
+	d method.Implementation.Write(methodImpl)
 	
 	ret method
 }
 
-ClassMethod ProcessArg(arg As %List, ByRef sourceArgs As %List, ByRef targetArgs As %List) As %String
+Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImpl As %String, ByRef serializationSpecs As %List, ByRef deserializationSpecs As %List)
 {
-	s argName = $lg(arg,1,"")
-	s argType = $lg(arg,2,"")
+	f i=1:1:$ll(cMethod.FormalSpecParsed) {
+		s arg = $lg(cMethod.FormalSpecParsed,i)
+		
+		d ##class(ExtremeAPI.Functions).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
+		
+		s dName = ..#DeserializedPrefix_argName
+		s deserializationSpecs = deserializationSpecs_$lb(dName)
 
-	if (argName = "")
-	{
-		$$$ThrowException("Has trouble in args specification")
+		s sName = ..#SerializedPrefix_argName
+		s sType = "%Library.List"
+		s:$$$IsDataType(dType) sType = dType
+		s serializationSpecs = serializationSpecs_$lb(sName_":"_sType)
+		
+		s code = ##class(ExtremeAPI.Generator.Deserializer).GetBlockCode(sName,dName,dType,dCollectionType)
+		s methodImpl = methodImpl_code_$c(13,10)
 	}
+}
 
- 	if (argType = "")
- 	{
-		$$$ThrowException("Arg '"_argName_"' has not type")
-	}
+Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializationSpecs As %List, ByRef methodImpl As %String, ByRef returnType As %String)
+{
+	d ##class(ExtremeAPI.Functions).GetMethodReturnInfo(cMethod, .returnType, .collectionType)
 	
-	s targetName = ..#DeserializedPrefix_argName
-	s targetType = $$$NormalizeClassName(argType)
-	s targetArgs = targetArgs_$lb(targetName)
-
-	s sourceName = ..#SerializedPrefix_argName
-	s sourceType = "%Library.List"
-	s:$$$IsDataType(targetType) sourceType = targetType
-	s sourceArgs = sourceArgs_$lb(sourceName_":"_sourceType)
+	s isCollection = (collectionType '= "")
+	s callControllerMethod = "##class("_cMethod.Origin_")."_cMethod.Name_"("_$lts(deserializationSpecs)_")"
 	
-	if $$$IsCollectionAsList(targetType)
+	if (returnType = "")
 	{
-		s ptr = $lf(arg,"ELEMENTTYPE")
-		if ((ptr = 0) || ($lg(arg,ptr+1,"") = ""))
+		s methodImpl = "	d "_callControllerMethod_$c(13,10)
+	}
+	else
+	{	
+		if ($$$IsDataType(returnType) && 'isCollection)
 		{
-			$$$ThrowException("Arg '"_targetName_"' is undefined 'ELEMENTTYPE' of collection")
+			s returnType = returnType
 		}
-		s collectionTargetType = targetType
-		s targetType = $$$NormalizeClassName($tr($lg(arg,ptr+1),"""",""))
+		else
+		{
+			s returnType = "%Library.List"
+		}
+		
+		s dResultVar = ..#DeserializedPrefix_"result"
+		s sResultVar = ..#SerializedPrefix_"result"
+		s condition = "("_dResultVar_" '= """")"
+		
+		s code = ##class(ExtremeAPI.Generator.Serializer).GetBlockCode(condition,sResultVar,dResultVar,returnType,isCollection)
+		
+		s methodImpl = "	s "_dResultVar_" = "_callControllerMethod_$c(13,10)
+			_code_$c(13,10)
+			_"	ret "_sResultVar_$c(13,10)
 	}
-	
-	ret ##class(ExtremeAPI.Generator.Deserializer).GetBlockCode(sourceName,targetName,targetType,collectionTargetType)
 }
 
 }

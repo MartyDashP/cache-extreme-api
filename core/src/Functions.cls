@@ -1,3 +1,5 @@
+Include ExtremeAPI.general
+
 Class ExtremeAPI.Functions Extends %RegisteredObject
 {
 
@@ -86,6 +88,60 @@ ClassMethod NormalizeClassName(className As %String) As %String
 {
 	$$$TOE(sc,$$NormalizeClassnameByCom^%occName(.result,className))
 	ret result
+}
+
+ClassMethod GetMethodReturnInfo(cMethod As %Dictionary.CompiledMethod, ByRef type As %String, ByRef collectionType As %String)
+{
+	s type = cMethod.ReturnType
+
+	if ..IsCollectionAsList(cMethod.ReturnType)
+	{
+		s collectionType = cMethod.ReturnType
+		
+		if ($f(cMethod.ReturnTypeParams,"ELEMENTTYPE") = 0)
+		{
+			$$$ThrowException("return collection type must have parameter 'ELEMENTTYPE'")
+		}
+			
+		s returnType = $lg($lfs(cMethod.ReturnTypeParams,"="),2)
+		s returnType = $tr(returnType,"""","")
+		
+		if (returnType = "")
+		{
+			$$$ThrowException("return collection element type is undefined")
+		}
+			
+		s type = ..NormalizeClassName(returnType)
+	}
+}
+
+ClassMethod GetMethodArgInfo(arg As %List, ByRef name As %String, ByRef type As %List, ByRef collectionType As %List)
+{
+	s name = $lg(arg,1,"")
+	s type = $lg(arg,2,"")
+
+	if (name = "")
+	{
+		$$$ThrowException("Has trouble in args specification")
+	}
+
+ 	if (type = "")
+ 	{
+		$$$ThrowException("Arg '"_argName_"' has not type")
+	}
+	
+	s type = $$$NormalizeClassName(type)
+	
+	if $$$IsCollectionAsList(type)
+	{
+		s ptr = $lf(arg,"ELEMENTTYPE")
+		if ((ptr = 0) || ($lg(arg,ptr+1,"") = ""))
+		{
+			$$$ThrowException("Arg '"_name_"' is undefined 'ELEMENTTYPE' of collection")
+		}
+		s collectionType = type
+		s type = $$$NormalizeClassName($tr($lg(arg,ptr+1),"""",""))
+	}
 }
 
 }
