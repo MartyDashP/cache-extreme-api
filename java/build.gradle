@@ -1,0 +1,35 @@
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+}
+
+group 'io.github.martydashp'
+version '1.0.0-SNAPSHOT'
+archivesBaseName = 'cache-extreme-api'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    }
+}
+
+dependencies {
+    implementation files('libs/cache-jdbc-2.0.0.jar')
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifactId = "${project.archivesBaseName}"
+        }
+    }
+}
