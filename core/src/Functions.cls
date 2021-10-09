@@ -81,7 +81,7 @@ ClassMethod IsDataType(typeName As %String) As %Boolean
 
 ClassMethod IsListType(typeName As %String) As %Boolean
 {
-	ret (typeName = "%Library.List")
+	ret (typeName = ##class(ExtremeAPI.ObjectScriptType).#ListType)
 }
 
 ClassMethod NormalizeClassName(className As %String) As %String
@@ -100,7 +100,7 @@ ClassMethod GetMethodReturnInfo(cMethod As %Dictionary.CompiledMethod, ByRef typ
 		
 		if ($f(cMethod.ReturnTypeParams,"ELEMENTTYPE") = 0)
 		{
-			$$$ThrowException("return collection type must have parameter 'ELEMENTTYPE'")
+			throw ##class(%Exception.General).%New("return collection type must have parameter 'ELEMENTTYPE'")
 		}
 			
 		s returnType = $lg($lfs(cMethod.ReturnTypeParams,"="),2)
@@ -108,7 +108,7 @@ ClassMethod GetMethodReturnInfo(cMethod As %Dictionary.CompiledMethod, ByRef typ
 		
 		if (returnType = "")
 		{
-			$$$ThrowException("return collection element type is undefined")
+			throw ##class(%Exception.General).%New("return collection element type is undefined")
 		}
 			
 		s type = ..NormalizeClassName(returnType)
@@ -122,12 +122,12 @@ ClassMethod GetMethodArgInfo(arg As %List, ByRef name As %String, ByRef type As 
 
 	if (name = "")
 	{
-		$$$ThrowException("Has trouble in args specification")
+		throw ##class(%Exception.General).%New("Has trouble in args specification")
 	}
 
  	if (type = "")
  	{
-		$$$ThrowException("Arg '"_argName_"' has not type")
+	 	throw ##class(%Exception.General).%New("Arg '"_argName_"' has not type")
 	}
 	
 	s type = $$$NormalizeClassName(type)
@@ -137,7 +137,7 @@ ClassMethod GetMethodArgInfo(arg As %List, ByRef name As %String, ByRef type As 
 		s ptr = $lf(arg,"ELEMENTTYPE")
 		if ((ptr = 0) || ($lg(arg,ptr+1,"") = ""))
 		{
-			$$$ThrowException("Arg '"_name_"' is undefined 'ELEMENTTYPE' of collection")
+			throw ##class(%Exception.General).%New("Arg '"_name_"' is undefined 'ELEMENTTYPE' of collection")
 		}
 		s collectionType = type
 		s type = $$$NormalizeClassName($tr($lg(arg,ptr+1),"""",""))

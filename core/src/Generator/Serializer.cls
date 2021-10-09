@@ -39,7 +39,7 @@ ClassMethod Generate() As %Status
 	 	}
 	 	else
 		{
-			$$$ThrowException("Extreme API unsupported type '"_type_"'")
+			throw $$$UnsupportedTypeExeption(type)
 		}
 
 	 	s codeBlock = ..GetBlockCode(condition, targetParam, ".."_sourceParam, sourceType, $$$IsCollectionProperty(property))
@@ -80,21 +80,18 @@ ClassMethod GetSerializationBlockCode(name As %String, type As %String, isCollec
 	elseif $$$IsDataType(type)
 	{
 		s serializeMethodName = $case(type,
-			"%Library.String": $$$GetMethodName(..SerializeString),
-			"%Library.Integer": $$$GetMethodName(..SerializeNum),
-			"%Library.Numeric": $$$GetMethodName(..SerializeNum), 
+			##class(ExtremeAPI.ObjectScriptType).#StringType: $$$GetMethodName(..SerializeString),
+			##class(ExtremeAPI.ObjectScriptType).#IntegerType: $$$GetMethodName(..SerializeNum),
+			##class(ExtremeAPI.ObjectScriptType).#NumericType: $$$GetMethodName(..SerializeNum), 
 			: "")
 			
-		if (serializeMethodName = "")
-		{
-            $$$ThrowException("Extreme API unsupported type '"_type_"'")
-		}
+		throw:(serializeMethodName = "") $$$UnsupportedTypeExeption(type)	
 		
 		s args = args _ $lb($$$Wrap(serializeMethodName))
 	}
 	else
 	{
-		$$$ThrowException("Extreme API unsupported type '"_type_"'")
+		throw $$$UnsupportedTypeExeption(type)
 	}
 	
 	s args = args _ $lb(name)

@@ -53,17 +53,13 @@ ClassMethod GetDeserializationBlockCode(varName As %String, type As %String, col
 	if (collectionType '= "")
 	{
 		s collectionType = $case(collectionType, 
-			"%Collection.ListOfDT": ##class(%Library.ListOfDataTypes).%ClassName(1),
-			##class(%Library.ListOfDataTypes).%ClassName(1): ##class(%Library.ListOfDataTypes).%ClassName(1),
-			"%Collection.ListOfObj": ##class(%Library.ListOfObjects).%ClassName(1),
-			##class(%Library.ListOfObjects).%ClassName(1): ##class(%Library.ListOfObjects).%ClassName(1),
+			##class(%Collection.ListOfDT).%ClassName(1): 		##class(%Library.ListOfDataTypes).%ClassName(1),
+			##class(%Library.ListOfDataTypes).%ClassName(1): 	##class(%Library.ListOfDataTypes).%ClassName(1),
+			##class(%Collection.ListOfObj).%ClassName(1): 		##class(%Library.ListOfObjects).%ClassName(1),
+			##class(%Library.ListOfObjects).%ClassName(1): 		##class(%Library.ListOfObjects).%ClassName(1),
 			:"")
-			
-		if (collectionType = "")
-		{
-            $$$ThrowException("Extreme API unsupported collection type '"_type_"'")
-		}
 		
+		throw:(collectionType = "") $$$UnsupportedTypeExeption(type)
 		s args = args_$lb($$$Wrap($$$GetMethodName(..DeserializeCollection)), $$$Wrap(collectionType))
 	}
 	
@@ -78,21 +74,17 @@ ClassMethod GetDeserializationBlockCode(varName As %String, type As %String, col
 	elseif $$$IsDataType(type)
 	{
 		s deserializeMethodName = $case(type,
-			"%Library.String": $$$GetMethodName(..DeserializePrimitive),
-			"%Library.Integer": $$$GetMethodName(..DeserializePrimitive),
-			"%Library.Numeric": $$$GetMethodName(..DeserializePrimitive), 
+			##class(ExtremeAPI.ObjectScriptType).#StringType: $$$GetMethodName(..DeserializePrimitive),
+			##class(ExtremeAPI.ObjectScriptType).#IntegerType: $$$GetMethodName(..DeserializePrimitive),
+			##class(ExtremeAPI.ObjectScriptType).#NumericType: $$$GetMethodName(..DeserializePrimitive), 
 			: "")
 			
-		if (deserializeMethodName = "")
-		{
-            $$$ThrowException("Extreme API unsupported type '"_type_"'")
-		}
-		
+        throw:(deserializeMethodName = "") $$$UnsupportedTypeExeption(type)
 		s args = args_$lb($$$Wrap(deserializeMethodName))
 	}
 	else
 	{
-		$$$ThrowException("Extreme API unsupported type '"_type_"'")
+		throw $$$UnsupportedTypeExeption(type)
 	}
 	
 	ret "##class("_..#DeserializerClassName_").%Call("_$lts(args)_")"

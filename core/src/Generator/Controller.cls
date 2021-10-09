@@ -21,7 +21,7 @@ ClassMethod Generate(compClass As %Dictionary.CompiledClass, controllerClassName
 {
 	if (controllerClassName = "")
 	{
-		$$$ThrowException("ControllerClassName is undefined")
+		throw ##class(%Exception.General).%New("ControllerClassName is undefined")
 	}
 	
 	ret:(compClass.Abstract = 1) $$$OK
@@ -43,7 +43,7 @@ Method CreateController()
 
 Method GenerateClassDefinition()
 {
-    s ..Controller = ##class(%Dictionary.ClassDefinition).%New()
+	s ..Controller = ##class(%Dictionary.ClassDefinition).%New()
 	s ..Controller.Final = 1
 	s ..Controller.GeneratedBy = ..%ClassName(1)
 	s ..Controller.Name = ..ControllerClassName
@@ -109,7 +109,11 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 
 		s sName = ..#SerializedPrefix_argName
 		s sType = "%Library.List"
-		s:$$$IsDataType(dType) sType = dType
+		
+		if ($$$IsDataType(dType) && (dCollectionType = ""))
+		{
+			s sType = dType
+		}
 		s serializationSpecs = serializationSpecs_$lb(sName_":"_sType)
 		
 		s code = ##class(ExtremeAPI.Generator.Deserializer).GetBlockCode(sName,dName,dType,dCollectionType)
@@ -136,7 +140,7 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializatio
 		}
 		else
 		{
-			s returnType = "%Library.List"
+			s returnType = ##class(ExtremeAPI.ObjectScriptType).#ListType
 		}
 		
 		s dResultVar = ..#DeserializedPrefix_"result"

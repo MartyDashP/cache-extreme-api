@@ -29,7 +29,7 @@ ROUTINE ExtremeAPI.general [Type=INC]
 #Define GetCompiledClass(%arg) $$$E(##class(ExtremeAPI.Functions).GetCompiledClass(%arg))
 
 ///
-#Define ThrowException(%args) throw $$$E(##class(ExtremeAPI.Exception).%New(%args))
+#Define UnsupportedTypeExeption(%type) $$$E(##class(ExtremeAPI.Exception.UnsupportedTypeException).%New(%type))
 
 ///
 #Define NormalizeClassName(%arg) $$$E(##class(ExtremeAPI.Functions).NormalizeClassName(%arg))

@@ -14,11 +14,15 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 	
 	if (rootPackageName = "")
 	{
-		$$$ThrowException("Root package for controller projection is undefined")
+		throw ##class(%Exception.General).%New("Root package for controller projection is undefined")
 	}
 	
 	s projectionName = ..GetProjectionName(rootPackageName, compClass.Name)
-	ret ##class(ExtremeAPI.Generator.Controller).Generate(compClass, projectionName)
+	s sc = ##class(ExtremeAPI.Generator.Controller).Generate(compClass, projectionName)
+	
+	w !,"Extreme API controller projection generated: "_projectionName,!
+	
+	ret sc
 }
 
 ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
