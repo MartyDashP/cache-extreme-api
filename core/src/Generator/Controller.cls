@@ -53,6 +53,7 @@ Method GenerateClassDefinition()
 
 Method GetClassMethods() As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefinition")
 {
+	s bannedMethods = $lb("%Call")
 	s methods = ##class(%ListOfObjects).%New()
 	
 	f
@@ -64,7 +65,8 @@ Method GetClassMethods() As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefini
 		if ((cMethod.Private = 1) 
 		|| (cMethod.Internal = 1) 
 		|| (cMethod.Origin '= ..CompClass.Name)
-		|| (cMethod.ClassMethod = 0) )
+		|| (cMethod.ClassMethod = 0) 
+		|| $lf(bannedMethods,cMethod.Name))
 		{
 			continue
 		}

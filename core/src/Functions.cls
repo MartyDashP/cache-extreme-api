@@ -144,5 +144,22 @@ ClassMethod GetMethodArgInfo(arg As %List, ByRef name As %String, ByRef type As 
 	}
 }
 
+ClassMethod GetJavaDocClass(compClass As %Dictionary.CompiledClass) As %String
+{
+	s javaDoc = "Origin: """_compClass.Name_""""
+		_$c(13,10)_"Timestamp: "_##class(%Library.UTC).NowLocal()
+		
+	if (compClass.Description '= "")
+	{
+		s javaDoc = javaDoc
+		_$c(13,10)_"Description: "
+		_$c(13,10)_"--------------"
+		_$c(13,10)_compClass.Description
+		_$c(13,10)_"--------------"
+	}
+	
+	ret javaDoc
+}
+
 }
 
