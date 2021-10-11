@@ -64,6 +64,12 @@ ClassMethod GetParameter(name As %String, ByRef parameters) As %String
 ClassMethod GetFullFileName(className As %String, ByRef parameters)
 {
 	s targetDir = ..GetParameter("TARGETDIR", .parameters)
+
+	if (targetDir = "")
+	{
+		throw ##class(%Exception.General).%New("Target dir for projection is undefined")
+	}
+	
 	s fileName = className_".xml"
 	s fullFileName = targetDir_"\"_fileName
 	

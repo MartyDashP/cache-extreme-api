@@ -1,7 +1,9 @@
 Class ExtremeAPI.AbstractController Extends %RegisteredObject [ Abstract ]
 {
 
-Projection ExtremeAPIController As ExtremeAPI.Projection.Controller(ROOTPACKAGENAME = "gen.controllers");
+Projection ExtremeAPIController As ExtremeAPI.Projection.Controller(ROOTPACKAGENAME = "generatedClasses");
+
+Projection JavaSpec As ExtremeAPI.Projection.JavaSpec(ROOTPACKAGENAME = "generatedClasses", TARGETDIR = "", TYPE = "Controller");
 
 ClassMethod %Call(s0request As %List, args...) As %List
 {
