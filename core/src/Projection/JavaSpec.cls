@@ -41,7 +41,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
 {
 	#dim compClass as %Dictionary.CompiledClass
-	s compClass = ##class(ExtremeAPI.Functions).GetCompiledClass(classname)
+	s compClass = ##class(ExtremeAPI.Util.Common).GetCompiledClass(classname)
 	
 	if ('$isObject(compClass) || compClass.Abstract)
 	{

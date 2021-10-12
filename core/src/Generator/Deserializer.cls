@@ -74,9 +74,9 @@ ClassMethod GetDeserializationBlockCode(varName As %String, type As %String, col
 	elseif $$$IsDataType(type)
 	{
 		s deserializeMethodName = $case(type,
-			##class(ExtremeAPI.ObjectScriptType).#StringType: $$$GetMethodName(..DeserializePrimitive),
-			##class(ExtremeAPI.ObjectScriptType).#IntegerType: $$$GetMethodName(..DeserializePrimitive),
-			##class(ExtremeAPI.ObjectScriptType).#NumericType: $$$GetMethodName(..DeserializePrimitive), 
+			##class(ExtremeAPI.Util.ObjectScriptType).#StringType: $$$GetMethodName(..DeserializePrimitive),
+			##class(ExtremeAPI.Util.ObjectScriptType).#IntegerType: $$$GetMethodName(..DeserializePrimitive),
+			##class(ExtremeAPI.Util.ObjectScriptType).#NumericType: $$$GetMethodName(..DeserializePrimitive), 
 			: "")
 			
         throw:(deserializeMethodName = "") $$$UnsupportedTypeExeption(type)
@@ -95,12 +95,12 @@ ClassMethod %Call(val, methodName As %String, args...)
 	ret $classmethod(..%ClassName(1), methodName, val, args...)
 }
 
-ClassMethod DeserializePrimitive(val) [ Internal ]
+ClassMethod DeserializePrimitive(val As %List) [ Internal ]
 {
 	ret val
 }
 
-ClassMethod DeserializeObject(val As ExtremeAPI.AbstractDTO, className As %String) [ Internal ]
+ClassMethod DeserializeObject(val As ExtremeAPI.DTO.Abstract, className As %String) [ Internal ]
 {
 	ret $classmethod(className, "%DeserializeExtremeApiDTO", val)
 }
@@ -108,7 +108,6 @@ ClassMethod DeserializeObject(val As ExtremeAPI.AbstractDTO, className As %Strin
 ClassMethod DeserializeCollection(val As %List, collectionClassName As %String, itemDeserializer As %String, args...) As %ListOfObjects [ Internal ]
 {
 	s resultList = $classmethod(collectionClassName,"%New")
-	
 	s col = ##class(%Collection.ListOfDT).%New()
 	
 	f i=1:1:$ll(val)

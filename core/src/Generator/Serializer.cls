@@ -80,9 +80,9 @@ ClassMethod GetSerializationBlockCode(name As %String, type As %String, isCollec
 	elseif $$$IsDataType(type)
 	{
 		s serializeMethodName = $case(type,
-			##class(ExtremeAPI.ObjectScriptType).#StringType: $$$GetMethodName(..SerializeString),
-			##class(ExtremeAPI.ObjectScriptType).#IntegerType: $$$GetMethodName(..SerializeNum),
-			##class(ExtremeAPI.ObjectScriptType).#NumericType: $$$GetMethodName(..SerializeNum), 
+			##class(ExtremeAPI.Util.ObjectScriptType).#StringType: $$$GetMethodName(..SerializeString),
+			##class(ExtremeAPI.Util.ObjectScriptType).#IntegerType: $$$GetMethodName(..SerializeNum),
+			##class(ExtremeAPI.Util.ObjectScriptType).#NumericType: $$$GetMethodName(..SerializeNum), 
 			: "")
 			
 		throw:(serializeMethodName = "") $$$UnsupportedTypeExeption(type)	
@@ -119,7 +119,7 @@ ClassMethod SerializeNum(val) [ Internal ]
 	ret +val
 }
 
-ClassMethod SerializeObject(val As ExtremeAPI.AbstractDTO) [ Internal ]
+ClassMethod SerializeObject(val As ExtremeAPI.DTO.Abstract) [ Internal ]
 {
 	ret val.%SerializeExtremeApiDTO()
 }

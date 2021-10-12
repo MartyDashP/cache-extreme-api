@@ -44,7 +44,7 @@ Method GetStaticImports() As %ListOfObjects
 	s imports = ##class(%ListOfObjects).%New()
 	
 	s serializer = ##class(JavaSpec.Model.StaticImport).%New()
-	s serializer.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.JavaType).#APISerializer)
+	s serializer.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.Util.JavaType).#APISerializer)
 	s serializer.Names = ##class(%ListOfDataTypes).%New()
 	$$$TOE(sc,serializer.Names.Insert("*"))
 	$$$TOE(sc,imports.Insert(serializer))
@@ -57,7 +57,7 @@ Method GetClassDefinition() As JavaSpec.Model.ClassDefinition
 	s classDefinition = ##class(JavaSpec.Model.ClassDefinition).%New()
 	s classDefinition.Kind = "class"
 	s classDefinition.Name = $lg($lfs(..CompClass.Name,"."),*)
-	s classDefinition.JavaDoc = ##class(ExtremeAPI.Functions).GetJavaDocClass(..CompClass)
+	s classDefinition.JavaDoc = ##class(ExtremeAPI.Util.Common).GetJavaDocClass(..CompClass)
 	s classDefinition.Properties = ..GetProperties()
 	s classDefinition.Modifiers = ..GetModifiers($lb("public", "final"))
 	s classDefinition.Methods = ..GetMethods()
@@ -91,7 +91,7 @@ Method GetProperties() As %ListOfObjects(ELEMENTTYPE="JavaSpec.Model.Property")
 	
 	s property = ##class(JavaSpec.Model.Property).%New()
 	s property.Name = ..#ConnectionVarName
-	s property.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.JavaType).#APIConnection)
+	s property.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.Util.JavaType).#APIConnection)
 	s property.Modifiers = ..GetModifiers($lb("private", "final"))
 	$$$TOE(sc,properties.Insert(property))
 	
@@ -100,7 +100,6 @@ Method GetProperties() As %ListOfObjects(ELEMENTTYPE="JavaSpec.Model.Property")
 
 Method GetMethods() As %ListOfObjects(ELEMENTTYPE="JavaSpec.Model.Method")
 {
-	s bannedMethods = $lb("%Call")
 	s methods = ##class(%ListOfObjects).%New()
 	$$$TOE(sc,methods.Insert(..GetConstructor()))
 	
@@ -135,7 +134,7 @@ Method GetConstructor() As JavaSpec.Model.Method
 	s method.Parameters = ##class(%ListOfObjects).%New()
 	
 	s parameter = ##class(JavaSpec.Model.Parameter).%New()
-	s parameter.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.JavaType).#APIConnection)
+	s parameter.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.Util.JavaType).#APIConnection)
 	s parameter.Name = "connection"
 	s parameter.Modifiers = ..GetModifiers($lb("final"))
 	$$$TOE(sc,method.Parameters.Insert(parameter))
@@ -153,7 +152,7 @@ Method GetMethod(cMethod As %Dictionary.CompiledMethod) As JavaSpec.Model.Method
 	s method.Parameters = methodParams
 	
 	d ..ProcessMethodResult(cMethod, args, .resultImpl, .resultType, .returnСollectionType)
-	s method.ReturnType = ##class(ExtremeAPI.JavaType).GetSpecType(resultType, returnСollectionType)
+	s method.ReturnType = ##class(ExtremeAPI.Util.JavaType).GetSpecType(resultType, returnСollectionType)
 	
 	s method.Code = methodImpl_resultImpl
 	
@@ -166,13 +165,13 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 	
 	f i=1:1:$ll(cMethod.FormalSpecParsed) {
 		s arg = $lg(cMethod.FormalSpecParsed,i)
-		d ##class(ExtremeAPI.Functions).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
+		d ##class(ExtremeAPI.Util.Common).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
 		s dVar = ..#DeserializedPrefix_argName
 
 		/// declare java method parameter
 		s parameter = ##class(JavaSpec.Model.Parameter).%New()
 		s parameter.Name = dVar
-		s parameter.Type = ##class(ExtremeAPI.JavaType).GetSpecType(dType,dCollectionType)
+		s parameter.Type = ##class(ExtremeAPI.Util.JavaType).GetSpecType(dType,dCollectionType)
 		$$$TOE(sc,methodParams.Insert(parameter))
 		
 		if ($$$IsDataType(dType) && (dCollectionType = ""))
@@ -191,7 +190,7 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 
 Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, args As %List, ByRef methodImpl As %String, ByRef returnType As %String, ByRef returnСollectionType As %String)
 {
-	d ##class(ExtremeAPI.Functions).GetMethodReturnInfo(cMethod,.returnType,.returnСollectionType)
+	d ##class(ExtremeAPI.Util.Common).GetMethodReturnInfo(cMethod,.returnType,.returnСollectionType)
 	
 	if (returnType '= "")
 	{

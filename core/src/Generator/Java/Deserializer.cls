@@ -18,7 +18,7 @@ ClassMethod GenerateCode(deserializerVarName As %String, ByRef compProperties) A
 
 Method GetCode() As %String
 {
-	s deserializerType = ##class(ExtremeAPI.JavaType).#APIDeserializer
+	s deserializerType = ##class(ExtremeAPI.Util.JavaType).#APIDeserializer
 	s code = ""
 	
 	f {
@@ -56,7 +56,7 @@ ClassMethod GetDeserializationCode(deserializerVarName As %String, type As %Stri
 	}
 	elseif $$$IsDataType(type)
 	{
-		s class = ##class(ExtremeAPI.JavaType).MapValueType(type)
+		s class = ##class(ExtremeAPI.Util.JavaType).MapValueType(type)
 		ret deserializerVarName_".getValue("_class_")"
 	}
 

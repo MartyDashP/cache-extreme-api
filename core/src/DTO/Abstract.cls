@@ -1,7 +1,7 @@
-Class ExtremeAPI.AbstractDTO Extends %RegisteredObject [ Abstract, CompileAfter = (ExtremeAPI.Generator.Deserializer, ExtremeAPI.Generator.Serializer) ]
+Class ExtremeAPI.DTO.Abstract Extends %RegisteredObject [ Abstract, CompileAfter = (ExtremeAPI.Generator.Deserializer, ExtremeAPI.Generator.Serializer) ]
 {
 
-Projection JavaSpec As ExtremeAPI.Projection.JavaSpec(TARGETDIR = "", TYPE = "DTO");
+Projection JavaSpec As ExtremeAPI.Projection.JavaSpec(TARGETDIR = "D:\_git\personal\java-cache-gateway-example\cache-projection\src\main\resources\", TYPE = "DTO");
 
 Method %SerializeExtremeApiDTO() [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
 {

@@ -1,6 +1,6 @@
 Include ExtremeAPI.general
 
-Class ExtremeAPI.JavaType Extends %RegisteredObject
+Class ExtremeAPI.Util.JavaType Extends %RegisteredObject
 {
 
 Parameter APISerializer = "io.github.martydashp.cache_extreme_api.Serializer";
@@ -58,9 +58,9 @@ ClassMethod GetSpecType(cacheType As %String, cacheCollectionType As %String) As
 ClassMethod MapValueType(type As %String) As %String
 {
 	s class = $case(type,
-			##class(ExtremeAPI.ObjectScriptType).#StringType: "String.class",
-			##class(ExtremeAPI.ObjectScriptType).#IntegerType: "Integer.class",
-			##class(ExtremeAPI.ObjectScriptType).#NumericType: "Integer.class", 
+			##class(ExtremeAPI.Util.ObjectScriptType).#StringType: "String.class",
+			##class(ExtremeAPI.Util.ObjectScriptType).#IntegerType: "Integer.class",
+			##class(ExtremeAPI.Util.ObjectScriptType).#NumericType: "Integer.class", 
 			: "")
 			
 	throw:(class = "") $$$UnsupportedTypeExeption(type)

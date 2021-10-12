@@ -53,7 +53,6 @@ Method GenerateClassDefinition()
 
 Method GetClassMethods() As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefinition")
 {
-	s bannedMethods = $lb("%Call")
 	s methods = ##class(%ListOfObjects).%New()
 	
 	f
@@ -104,7 +103,7 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 	f i=1:1:$ll(cMethod.FormalSpecParsed) {
 		s arg = $lg(cMethod.FormalSpecParsed,i)
 		
-		d ##class(ExtremeAPI.Functions).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
+		d ##class(ExtremeAPI.Util.Common).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
 		
 		s dName = ..#DeserializedPrefix_argName
 		s deserializationSpecs = deserializationSpecs_$lb(dName)
@@ -125,7 +124,7 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 
 Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializationSpecs As %List, ByRef methodImpl As %String, ByRef returnType As %String)
 {
-	d ##class(ExtremeAPI.Functions).GetMethodReturnInfo(cMethod, .returnType, .collectionType)
+	d ##class(ExtremeAPI.Util.Common).GetMethodReturnInfo(cMethod, .returnType, .collectionType)
 	
 	s isCollection = (collectionType '= "")
 	s callControllerMethod = "##class("_cMethod.Origin_")."_cMethod.Name_"("_$lts(deserializationSpecs)_")"
@@ -142,7 +141,7 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializatio
 		}
 		else
 		{
-			s returnType = ##class(ExtremeAPI.ObjectScriptType).#ListType
+			s returnType = ##class(ExtremeAPI.Util.ObjectScriptType).#ListType
 		}
 		
 		s dResultVar = ..#DeserializedPrefix_"result"
