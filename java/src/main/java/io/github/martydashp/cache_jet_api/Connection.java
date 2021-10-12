@@ -11,7 +11,7 @@ import java.util.function.Function;
 public class Connection extends CacheConnection {
 
     final String mainControllerClassName = "JetAPI.Controller.Main";
-    final String mainMethodClassName = "%InvokeController";
+    final String mainMethodClassName = "%jetApiInvoke";
 
     public final void connect(String host, int superServerPort, String namespace, String username, String password) {
 
@@ -26,11 +26,11 @@ public class Connection extends CacheConnection {
         this.xepConnect(host, superServerPort, namespace, username, password);
     }
 
-    public void callMethod(String controllerName, String methodName, Object... params) {
-        callMethod(controllerName, methodName, null, params);
+    public void invoke(String controllerName, String methodName, Object... params) {
+        invoke(controllerName, methodName, null, params);
     }
 
-    public <T> T callMethod(String controllerName, String methodName, Function<Deserializer, T> des, Object... params) {
+    public <T> T invoke(String controllerName, String methodName, Function<Deserializer, T> des, Object... params) {
         final Object[] requestData = {new Request(controllerName, methodName).getSerializedData(this)};
 
         final Object[] inputBuf = Arrays.copyOf(requestData, requestData.length + params.length);

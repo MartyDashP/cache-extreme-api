@@ -7,9 +7,6 @@ Parameter SerializerClassName = "JetAPI.Generator.Serializer";
 
 ClassMethod Generate() As %Status
 {
-	#dim %code as %Stream.MethodGenerator
-	#dim %compiledclass as %Dictionary.CompiledClass
-
     $$$CollectSortedClassProperties(.properties, %compiledclass)
 
     f {
@@ -121,7 +118,7 @@ ClassMethod SerializeNum(val) [ Internal ]
 
 ClassMethod SerializeObject(val As JetAPI.DTO.Abstract) [ Internal ]
 {
-	ret val.%SerializeJetApiDTO()
+	ret val.%jetApiSerializeDTO()
 }
 
 ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collection.AbstractList) [ Internal ]
@@ -146,3 +143,4 @@ ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collecti
 }
 
 }
+

@@ -1,18 +1,33 @@
-Class JetAPI.DTO.Abstract Extends %RegisteredObject [ Abstract, CompileAfter = (JetAPI.Generator.Deserializer, JetAPI.Generator.Serializer) ]
+Class JetAPI.DTO.Abstract Extends %RegisteredObject [ Abstract, DependsOn = (JetAPI.Generator.Serializer, JetAPI.Generator.Deserializer, JetAPI.Projection.JavaSpec) ]
 {
 
-Projection JavaSpec As JetAPI.Projection.JavaSpec(TARGETDIR = "D:\_git\personal\java-cache-gateway-example\cache-projection\src\main\resources\", TYPE = "DTO");
+Projection JavaSpec As JetAPI.Projection.JavaSpec(TYPE = "dto");
 
-Method %SerializeJetApiDTO() [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
+Method %jetApiSerializeDTO() [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
 {
-	$$$TOE(sc,##class(JetAPI.Generator.Serializer).Generate())
- 	ret sc
+	if (%compiledclass.Name = "JetAPI.DTO.Abstract")
+	{
+		$$$TOE(sc, ##class(JetAPI.Generator.Serializer).Generate())
+ 		ret sc	
+	}
+
+ 	ret $$$OK
 }
 
-ClassMethod %DeserializeJetApiDTO(sObj As %List) [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
+ClassMethod %jetApiDeserializeDTO(sObj As %List) [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
 {
-	$$$TOE(sc,##class(JetAPI.Generator.Deserializer).Generate())
- 	ret sc
+	if (%compiledclass.Name = "JetAPI.DTO.Abstract")
+	{
+		$$$TOE(sc, ##class(JetAPI.Generator.Deserializer).Generate())
+	 	ret sc
+	}
+
+ 	ret $$$OK
+}
+
+ClassMethod %jetApiJavaSpecProjectionTargetPath() As %String [ Internal ]
+{
+	ret ^jetApiJavaSpecPath
 }
 
 }

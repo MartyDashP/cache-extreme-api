@@ -102,7 +102,7 @@ ClassMethod DeserializePrimitive(val As %List) [ Internal ]
 
 ClassMethod DeserializeObject(val As JetAPI.DTO.Abstract, className As %String) [ Internal ]
 {
-	ret $classmethod(className, "%DeserializeJetApiDTO", val)
+	ret $classmethod(className, "%jetApiDeserializeDTO", val)
 }
 
 ClassMethod DeserializeCollection(val As %List, collectionClassName As %String, itemDeserializer As %String, args...) As %ListOfObjects [ Internal ]
@@ -121,3 +121,4 @@ ClassMethod DeserializeCollection(val As %List, collectionClassName As %String, 
 }
 
 }
+

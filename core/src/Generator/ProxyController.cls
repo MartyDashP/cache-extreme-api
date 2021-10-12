@@ -1,6 +1,6 @@
 Include JetAPI.general
 
-Class JetAPI.Generator.Controller Extends %RegisteredObject [ CompileAfter = (JetAPI.Generator.Deserializer, JetAPI.Generator.Serializer) ]
+Class JetAPI.Generator.ProxyController Extends %RegisteredObject [ DependsOn = (JetAPI.Generator.Deserializer, JetAPI.Generator.Serializer) ]
 {
 
 Parameter DeserializerClassName = "JetAPI.Generator.Deserializer";
@@ -64,8 +64,8 @@ Method GetClassMethods() As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefini
 		if ((cMethod.Private = 1) 
 		|| (cMethod.Internal = 1) 
 		|| (cMethod.Origin '= ..CompClass.Name)
-		|| (cMethod.ClassMethod = 0) 
-		|| $lf(bannedMethods,cMethod.Name))
+		|| (cMethod.ClassMethod = 0)
+		|| $MATCH(cMethod.Name,"^\%(jetApi).*"))
 		{
 			continue
 		}
@@ -157,3 +157,4 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializatio
 }
 
 }
+
