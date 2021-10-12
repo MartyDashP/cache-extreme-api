@@ -41,7 +41,11 @@ ClassMethod %jetApiSendToStream(payload, payloadType As %String)
 	use @..#DeviceIO
 	
 	s chunk = ##class(JetAPI.DTO.Response).CreateStreamResponse(payload, payloadType).%jetApiSerializeDTO()
-	w ..%jetApiGetHeader(chunk)_$c(0,0)_chunk, !
+	
+	w ..%jetApiGetHeader(chunk)
+	w $c(0,0)
+	w chunk
+	w !
 
 	use currentIO
 }
