@@ -3,7 +3,7 @@ Include ExtremeAPI.general
 Class ExtremeAPI.Generator.Deserializer Extends %RegisteredObject
 {
 
-Parameter DeserializerClassName = {..%ClassName(1)};
+Parameter DeserializerClassName = "ExtremeAPI.Generator.Deserializer";
 
 ClassMethod Generate() As %Status
 {
@@ -121,4 +121,3 @@ ClassMethod DeserializeCollection(val As %List, collectionClassName As %String, 
 }
 
 }
-

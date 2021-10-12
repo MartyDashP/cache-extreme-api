@@ -3,9 +3,9 @@ Include ExtremeAPI.general
 Class ExtremeAPI.Generator.Controller Extends %RegisteredObject [ CompileAfter = (ExtremeAPI.Generator.Deserializer, ExtremeAPI.Generator.Serializer) ]
 {
 
-Parameter DeserializerClassName = {##class(ExtremeAPI.Generator.Deserializer).%ClassName(1)};
+Parameter DeserializerClassName = "ExtremeAPI.Generator.Deserializer";
 
-Parameter SerializerClassName = {##class(ExtremeAPI.Generator.Serializer).%ClassName(1)};
+Parameter SerializerClassName = "ExtremeAPI.Generator.Serializer";
 
 Parameter SerializedPrefix = "s0";
 
@@ -157,4 +157,3 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializatio
 }
 
 }
-

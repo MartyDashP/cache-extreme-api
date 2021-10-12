@@ -3,7 +3,7 @@ Include ExtremeAPI.general
 Class ExtremeAPI.Generator.Serializer Extends %RegisteredObject
 {
 
-Parameter SerializerClassName = {..%ClassName(1)};
+Parameter SerializerClassName = "ExtremeAPI.Generator.Serializer";
 
 ClassMethod Generate() As %Status
 {
@@ -146,4 +146,3 @@ ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collecti
 }
 
 }
-
