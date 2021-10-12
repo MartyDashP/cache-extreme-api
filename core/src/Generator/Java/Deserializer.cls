@@ -1,6 +1,6 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Generator.Java.Deserializer Extends %RegisteredObject
+Class JetAPI.Generator.Java.Deserializer Extends %RegisteredObject
 {
 
 Property DeserializerVarName [ Private ];
@@ -18,7 +18,7 @@ ClassMethod GenerateCode(deserializerVarName As %String, ByRef compProperties) A
 
 Method GetCode() As %String
 {
-	s deserializerType = ##class(ExtremeAPI.Util.JavaType).#APIDeserializer
+	s deserializerType = ##class(JetAPI.Util.JavaType).#APIDeserializer
 	s code = ""
 	
 	f {
@@ -56,7 +56,7 @@ ClassMethod GetDeserializationCode(deserializerVarName As %String, type As %Stri
 	}
 	elseif $$$IsDataType(type)
 	{
-		s class = ##class(ExtremeAPI.Util.JavaType).MapValueType(type)
+		s class = ##class(JetAPI.Util.JavaType).MapValueType(type)
 		ret deserializerVarName_".getValue("_class_")"
 	}
 

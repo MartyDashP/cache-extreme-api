@@ -1,17 +1,17 @@
-Class ExtremeAPI.DTO.Abstract Extends %RegisteredObject [ Abstract, CompileAfter = (ExtremeAPI.Generator.Deserializer, ExtremeAPI.Generator.Serializer) ]
+Class JetAPI.DTO.Abstract Extends %RegisteredObject [ Abstract, CompileAfter = (JetAPI.Generator.Deserializer, JetAPI.Generator.Serializer) ]
 {
 
-Projection JavaSpec As ExtremeAPI.Projection.JavaSpec(TARGETDIR = "D:\_git\personal\java-cache-gateway-example\cache-projection\src\main\resources\", TYPE = "DTO");
+Projection JavaSpec As JetAPI.Projection.JavaSpec(TARGETDIR = "D:\_git\personal\java-cache-gateway-example\cache-projection\src\main\resources\", TYPE = "DTO");
 
-Method %SerializeExtremeApiDTO() [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
+Method %SerializeJetApiDTO() [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
 {
-	$$$TOE(sc,##class(ExtremeAPI.Generator.Serializer).Generate())
+	$$$TOE(sc,##class(JetAPI.Generator.Serializer).Generate())
  	ret sc
 }
 
-ClassMethod %DeserializeExtremeApiDTO(sObj As %List) [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
+ClassMethod %DeserializeJetApiDTO(sObj As %List) [ CodeMode = objectgenerator, Internal, ServerOnly = 1 ]
 {
-	$$$TOE(sc,##class(ExtremeAPI.Generator.Deserializer).Generate())
+	$$$TOE(sc,##class(JetAPI.Generator.Deserializer).Generate())
  	ret sc
 }
 

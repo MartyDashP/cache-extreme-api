@@ -1,4 +1,4 @@
-Class ExtremeAPI.Exception.UnsupportedTypeException Extends %Exception.General
+Class JetAPI.Exception.UnsupportedTypeException Extends %Exception.General
 {
 
 Method %OnNew(type As %String) As %Status [ Private ]

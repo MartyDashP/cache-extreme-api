@@ -1,9 +1,9 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Generator.Serializer Extends %RegisteredObject
+Class JetAPI.Generator.Serializer Extends %RegisteredObject
 {
 
-Parameter SerializerClassName = "ExtremeAPI.Generator.Serializer";
+Parameter SerializerClassName = "JetAPI.Generator.Serializer";
 
 ClassMethod Generate() As %Status
 {
@@ -80,9 +80,9 @@ ClassMethod GetSerializationBlockCode(name As %String, type As %String, isCollec
 	elseif $$$IsDataType(type)
 	{
 		s serializeMethodName = $case(type,
-			##class(ExtremeAPI.Util.ObjectScriptType).#StringType: $$$GetMethodName(..SerializeString),
-			##class(ExtremeAPI.Util.ObjectScriptType).#IntegerType: $$$GetMethodName(..SerializeNum),
-			##class(ExtremeAPI.Util.ObjectScriptType).#NumericType: $$$GetMethodName(..SerializeNum), 
+			##class(JetAPI.Util.ObjectScriptType).#StringType: $$$GetMethodName(..SerializeString),
+			##class(JetAPI.Util.ObjectScriptType).#IntegerType: $$$GetMethodName(..SerializeNum),
+			##class(JetAPI.Util.ObjectScriptType).#NumericType: $$$GetMethodName(..SerializeNum), 
 			: "")
 			
 		throw:(serializeMethodName = "") $$$UnsupportedTypeExeption(type)	
@@ -119,9 +119,9 @@ ClassMethod SerializeNum(val) [ Internal ]
 	ret +val
 }
 
-ClassMethod SerializeObject(val As ExtremeAPI.DTO.Abstract) [ Internal ]
+ClassMethod SerializeObject(val As JetAPI.DTO.Abstract) [ Internal ]
 {
-	ret val.%SerializeExtremeApiDTO()
+	ret val.%SerializeJetApiDTO()
 }
 
 ClassMethod SerializeCollectionList(itemSerializer As %String, list As %Collection.AbstractList) [ Internal ]

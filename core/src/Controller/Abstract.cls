@@ -1,9 +1,9 @@
-Class ExtremeAPI.Controller.Abstract Extends %RegisteredObject [ Abstract ]
+Class JetAPI.Controller.Abstract Extends %RegisteredObject [ Abstract ]
 {
 
-Projection ExtremeAPIController As ExtremeAPI.Projection.Controller(ROOTPACKAGENAME = "generatedClasses");
+Projection JetAPIController As JetAPI.Projection.Controller(ROOTPACKAGENAME = "generatedClasses");
 
-Projection JavaSpec As ExtremeAPI.Projection.JavaSpec(ROOTPACKAGENAME = "generatedClasses", TARGETDIR = "D:\_git\personal\java-cache-gateway-example\cache-projection\src\main\resources\", TYPE = "Controller");
+Projection JavaSpec As JetAPI.Projection.JavaSpec(ROOTPACKAGENAME = "generatedClasses", TARGETDIR = "D:\_git\personal\java-cache-gateway-example\cache-projection\src\main\resources\", TYPE = "Controller");
 
 }
 

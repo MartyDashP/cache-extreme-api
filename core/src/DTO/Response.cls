@@ -1,4 +1,4 @@
-Class ExtremeAPI.DTO.Response Extends %RegisteredObject
+Class JetAPI.DTO.Response Extends %RegisteredObject
 {
 
 Parameter StatusOK = "ok";

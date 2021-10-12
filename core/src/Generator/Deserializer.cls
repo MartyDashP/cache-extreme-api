@@ -1,9 +1,9 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Generator.Deserializer Extends %RegisteredObject
+Class JetAPI.Generator.Deserializer Extends %RegisteredObject
 {
 
-Parameter DeserializerClassName = "ExtremeAPI.Generator.Deserializer";
+Parameter DeserializerClassName = "JetAPI.Generator.Deserializer";
 
 ClassMethod Generate() As %Status
 {
@@ -74,9 +74,9 @@ ClassMethod GetDeserializationBlockCode(varName As %String, type As %String, col
 	elseif $$$IsDataType(type)
 	{
 		s deserializeMethodName = $case(type,
-			##class(ExtremeAPI.Util.ObjectScriptType).#StringType: $$$GetMethodName(..DeserializePrimitive),
-			##class(ExtremeAPI.Util.ObjectScriptType).#IntegerType: $$$GetMethodName(..DeserializePrimitive),
-			##class(ExtremeAPI.Util.ObjectScriptType).#NumericType: $$$GetMethodName(..DeserializePrimitive), 
+			##class(JetAPI.Util.ObjectScriptType).#StringType: $$$GetMethodName(..DeserializePrimitive),
+			##class(JetAPI.Util.ObjectScriptType).#IntegerType: $$$GetMethodName(..DeserializePrimitive),
+			##class(JetAPI.Util.ObjectScriptType).#NumericType: $$$GetMethodName(..DeserializePrimitive), 
 			: "")
 			
         throw:(deserializeMethodName = "") $$$UnsupportedTypeExeption(type)
@@ -100,9 +100,9 @@ ClassMethod DeserializePrimitive(val As %List) [ Internal ]
 	ret val
 }
 
-ClassMethod DeserializeObject(val As ExtremeAPI.DTO.Abstract, className As %String) [ Internal ]
+ClassMethod DeserializeObject(val As JetAPI.DTO.Abstract, className As %String) [ Internal ]
 {
-	ret $classmethod(className, "%DeserializeExtremeApiDTO", val)
+	ret $classmethod(className, "%DeserializeJetApiDTO", val)
 }
 
 ClassMethod DeserializeCollection(val As %List, collectionClassName As %String, itemDeserializer As %String, args...) As %ListOfObjects [ Internal ]

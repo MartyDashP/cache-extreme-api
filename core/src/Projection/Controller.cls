@@ -1,6 +1,6 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Projection.Controller Extends %Projection.AbstractProjection [ Abstract ]
+Class JetAPI.Projection.Controller Extends %Projection.AbstractProjection [ Abstract ]
 {
 
 Parameter ROOTPACKAGENAME;
@@ -18,7 +18,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 	}
 	
 	s projectionName = ..GetProjectionName(rootPackageName, compClass.Name)
-	s sc = ##class(ExtremeAPI.Generator.Controller).Generate(compClass, projectionName)
+	s sc = ##class(JetAPI.Generator.Controller).Generate(compClass, projectionName)
 	
 	w !,"Extreme API controller projection generated: "_projectionName,!
 	

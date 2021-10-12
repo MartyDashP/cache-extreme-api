@@ -1,9 +1,9 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Util.Common Extends %RegisteredObject
+Class JetAPI.Util.Common Extends %RegisteredObject
 {
 
-Parameter BasicSupportedObjectClassName = "ExtremeAPI.DTO.Abstract";
+Parameter BasicSupportedObjectClassName = "JetAPI.DTO.Abstract";
 
 ClassMethod CollectSortedClassProperties(ByRef properties, comClass As %Dictionary.CompiledClass)
 {
@@ -81,7 +81,7 @@ ClassMethod IsDataType(typeName As %String) As %Boolean
 
 ClassMethod IsListType(typeName As %String) As %Boolean
 {
-	ret (typeName = ##class(ExtremeAPI.Util.ObjectScriptType).#ListType)
+	ret (typeName = ##class(JetAPI.Util.ObjectScriptType).#ListType)
 }
 
 ClassMethod NormalizeClassName(className As %String) As %String
