@@ -25,6 +25,8 @@ public class Deserializer {
                 return (T) reader.getString();
             } else if (Integer.class == clazz) {
                 return (T) Integer.valueOf(reader.getInt());
+            } else if (Boolean.class == clazz) {
+                return (T) Boolean.valueOf(reader.getBoolean());
             } else if (Double.class == clazz) {
                 return (T) Double.valueOf(reader.getDouble());
             }
