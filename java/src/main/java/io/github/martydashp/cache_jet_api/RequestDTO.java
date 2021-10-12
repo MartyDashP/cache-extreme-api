@@ -1,4 +1,4 @@
-package io.github.martydashp.cache_extreme_api;
+package io.github.martydashp.cache_jet_api;
 
 public final class RequestDTO implements AbstractDTO {
 

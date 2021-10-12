@@ -1,4 +1,4 @@
-package io.github.martydashp.cache_extreme_api;
+package io.github.martydashp.cache_jet_api;
 
 import com.intersys.jdbc.CacheConnection;
 import com.intersys.jdbc.CacheListReader;
@@ -7,8 +7,8 @@ import java.util.function.Function;
 
 public class Connection extends CacheConnection {
 
-    final String mainControllerClassName = "ExtremeAPI.AbstractController";
-    final String mainMethodClassName = "%Call";
+    final String mainControllerClassName = "JetAPI.Controller.Main";
+    final String mainMethodClassName = "%InvokeController";
 
     public final void connect(String host, int superServerPort, String namespace, String username, String password) {
 

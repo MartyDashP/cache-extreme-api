@@ -20,7 +20,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 	s projectionName = ..GetProjectionName(rootPackageName, compClass.Name)
 	s sc = ##class(JetAPI.Generator.Controller).Generate(compClass, projectionName)
 	
-	w !,"Extreme API controller projection generated: "_projectionName,!
+	w !,"Jet API controller projection generated: "_projectionName,!
 	
 	ret sc
 }

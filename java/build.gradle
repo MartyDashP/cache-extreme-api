@@ -1,11 +1,11 @@
 plugins {
-    id 'groovy'
+    id 'java'
     id 'maven-publish'
 }
 
 group 'io.github.martydashp'
 version '1.0.0-SNAPSHOT'
-archivesBaseName = 'cache-extreme-api'
+archivesBaseName = 'cache-jet-api'
 
 repositories {
     mavenCentral()

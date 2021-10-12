@@ -3,13 +3,13 @@ Include JetAPI.general
 Class JetAPI.Util.JavaType Extends %RegisteredObject
 {
 
-Parameter APISerializer = "io.github.martydashp.cache_extreme_api.Serializer";
+Parameter APISerializer = "io.github.martydashp.cache_jet_api.Serializer";
 
-Parameter APIDeserializer = "io.github.martydashp.cache_extreme_api.Deserializer";
+Parameter APIDeserializer = "io.github.martydashp.cache_jet_api.Deserializer";
 
-Parameter APIConnection = "io.github.martydashp.cache_extreme_api.Connection";
+Parameter APIConnection = "io.github.martydashp.cache_jet_api.Connection";
 
-Parameter APIAbstractDTO = "io.github.martydashp.cache_extreme_api.AbstractDTO";
+Parameter APIAbstractDTO = "io.github.martydashp.cache_jet_api.AbstractDTO";
 
 Parameter CacheListReader = "com.intersys.jdbc.CacheListReader";
 
