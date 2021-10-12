@@ -1,6 +1,7 @@
-package io.github.martydashp.cache_extreme_api;
+package io.github.martydashp.cache_jet_api;
 
 import com.intersys.jdbc.CacheListBuilder;
+import io.github.martydashp.cache_jet_api.dto.AbstractDTO;
 import java.util.List;
 import java.util.function.BiConsumer;
 

@@ -1,4 +1,4 @@
-Class ExtremeAPI.ObjectScriptType Extends %RegisteredObject
+Class JetAPI.Util.ObjectScriptType Extends %RegisteredObject
 {
 
 Parameter StringType = "%Library.String";

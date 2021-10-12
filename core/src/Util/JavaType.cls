@@ -1,15 +1,15 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.JavaType Extends %RegisteredObject
+Class JetAPI.Util.JavaType Extends %RegisteredObject
 {
 
-Parameter APISerializer = "io.github.martydashp.cache_extreme_api.Serializer";
+Parameter APISerializer = "io.github.martydashp.cache_jet_api.Serializer";
 
-Parameter APIDeserializer = "io.github.martydashp.cache_extreme_api.Deserializer";
+Parameter APIDeserializer = "io.github.martydashp.cache_jet_api.Deserializer";
 
-Parameter APIConnection = "io.github.martydashp.cache_extreme_api.Connection";
+Parameter APIConnection = "io.github.martydashp.cache_jet_api.Connection";
 
-Parameter APIAbstractDTO = "io.github.martydashp.cache_extreme_api.AbstractDTO";
+Parameter APIAbstractDTO = "io.github.martydashp.cache_jet_api.dto.AbstractDTO";
 
 Parameter CacheListReader = "com.intersys.jdbc.CacheListReader";
 
@@ -58,9 +58,9 @@ ClassMethod GetSpecType(cacheType As %String, cacheCollectionType As %String) As
 ClassMethod MapValueType(type As %String) As %String
 {
 	s class = $case(type,
-			##class(ExtremeAPI.ObjectScriptType).#StringType: "String.class",
-			##class(ExtremeAPI.ObjectScriptType).#IntegerType: "Integer.class",
-			##class(ExtremeAPI.ObjectScriptType).#NumericType: "Integer.class", 
+			##class(JetAPI.Util.ObjectScriptType).#StringType: "String.class",
+			##class(JetAPI.Util.ObjectScriptType).#IntegerType: "Integer.class",
+			##class(JetAPI.Util.ObjectScriptType).#NumericType: "Integer.class", 
 			: "")
 			
 	throw:(class = "") $$$UnsupportedTypeExeption(type)

@@ -1,6 +1,9 @@
-package io.github.martydashp.cache_extreme_api;
+package io.github.martydashp.cache_jet_api.dto;
 
 import com.intersys.jdbc.CacheListReader;
+import io.github.martydashp.cache_jet_api.Connection;
+import io.github.martydashp.cache_jet_api.Deserializer;
+import io.github.martydashp.cache_jet_api.Serializer;
 
 public interface AbstractDTO {
 

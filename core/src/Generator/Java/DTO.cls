@@ -1,6 +1,6 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Generator.Java.DTO Extends %RegisteredObject
+Class JetAPI.Generator.Java.DTO Extends %RegisteredObject
 {
 
 Property CompClass As %Dictionary.CompiledClass [ Private ];
@@ -40,7 +40,7 @@ Method GetClassDefinition() As JavaSpec.Model.ClassDefinition
 	s classDefinition.Name = $lg($lfs(..CompClass.Name,"."),*)
 	s classDefinition.Modifiers = ..GetModifiers($lb("public"))
 	s classDefinition.SuperInterfaces = ..GetSuperInterfaces()
-	s classDefinition.JavaDoc = ##class(ExtremeAPI.Functions).GetJavaDocClass(..CompClass)
+	s classDefinition.JavaDoc = ##class(JetAPI.Util.Common).GetJavaDocClass(..CompClass)
 	s classDefinition.Properties = ..GetProperties()
 	s classDefinition.Methods = ##class(%ListOfObjects).%New()
 	d classDefinition.Methods.Insert(..GetInitMethod())
@@ -52,7 +52,7 @@ Method GetClassDefinition() As JavaSpec.Model.ClassDefinition
 Method GetSuperInterfaces() As %ListOfDataTypes
 {
 	s superInterfaces = ##class(%ListOfDataTypes).%New()
-	$$$TOE(sc,superInterfaces.Insert(##class(ExtremeAPI.JavaType).#APIAbstractDTO))
+	$$$TOE(sc,superInterfaces.Insert(##class(JetAPI.Util.JavaType).#APIAbstractDTO))
 	
 	ret superInterfaces
 }
@@ -94,7 +94,7 @@ Method GetProperty(compProperty As %Dictionary.CompiledProperty) As JavaSpec.Mod
 	s property = ##class(JavaSpec.Model.Property).%New()
 	s property.Name = compProperty.Name
 	s property.JavaDoc = compProperty.Description
-	s property.Type = ##class(ExtremeAPI.JavaType).GetSpecType(compProperty.Type, compProperty.RuntimeType)
+	s property.Type = ##class(JetAPI.Util.JavaType).GetSpecType(compProperty.Type, compProperty.RuntimeType)
 	s property.Modifiers = ..GetModifiers($lb("public"))
 	
 	ret property
@@ -112,11 +112,11 @@ Method GetInitMethod() As JavaSpec.Model.Method
 	
 	s param = ##class(JavaSpec.Model.Parameter).%New()
 	s param.Name = ..#DeserializerVarName
-	s param.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.JavaType).#APIDeserializer)
+	s param.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(JetAPI.Util.JavaType).#APIDeserializer)
 	d method.Parameters.Insert(param)
 
 	m props = ..CompProperties
-	s method.Code = ##class(ExtremeAPI.Generator.Java.Deserializer).GenerateCode(..#DeserializerVarName, .props)
+	s method.Code = ##class(JetAPI.Generator.Java.Deserializer).GenerateCode(..#DeserializerVarName, .props)
 	
 	ret method
 }
@@ -133,11 +133,11 @@ Method GetSerializeMethod() As JavaSpec.Model.Method
 	
 	s param = ##class(JavaSpec.Model.Parameter).%New()
 	s param.Name = ..#SerializerVarName
-	s param.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(ExtremeAPI.JavaType).#APISerializer)
+	s param.Type = ##class(JavaSpec.Model.Type).SimpleType(##class(JetAPI.Util.JavaType).#APISerializer)
 	d method.Parameters.Insert(param)
 
 	m props = ..CompProperties
-	s method.Code = ##class(ExtremeAPI.Generator.Java.Serializer).GenerateCode(..#SerializerVarName, .props)
+	s method.Code = ##class(JetAPI.Generator.Java.Serializer).GenerateCode(..#SerializerVarName, .props)
 
 	ret method
 }

@@ -1,6 +1,6 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Projection.JavaSpec Extends %Projection.AbstractProjection [ Abstract ]
+Class JetAPI.Projection.JavaSpec Extends %Projection.AbstractProjection [ Abstract ]
 {
 
 Parameter TYPE;
@@ -21,12 +21,12 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 		
 	if (type = "DTO")
 	{
-		s source = ##class(ExtremeAPI.Generator.Java.DTO).Generate(compClass)
+		s source = ##class(JetAPI.Generator.Java.DTO).Generate(compClass)
 	}
 	elseif (type = "Controller")
 	{
 		s controllerName = ..GetProjectionName(..GetParameter("ROOTPACKAGENAME", .parameters),compClass.Name)
-		s source = ##class(ExtremeAPI.Generator.Java.Controller).Generate(controllerName, compClass)
+		s source = ##class(JetAPI.Generator.Java.Controller).Generate(controllerName, compClass)
 	}
 	
 	if ($isObject(source) && (fullFileName '= ""))
@@ -41,7 +41,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
 {
 	#dim compClass as %Dictionary.CompiledClass
-	s compClass = ##class(ExtremeAPI.Functions).GetCompiledClass(classname)
+	s compClass = ##class(JetAPI.Util.Common).GetCompiledClass(classname)
 	
 	if ('$isObject(compClass) || compClass.Abstract)
 	{

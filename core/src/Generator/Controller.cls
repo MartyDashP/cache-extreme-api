@@ -1,11 +1,11 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Generator.Controller Extends %RegisteredObject [ CompileAfter = (ExtremeAPI.Generator.Deserializer, ExtremeAPI.Generator.Serializer) ]
+Class JetAPI.Generator.Controller Extends %RegisteredObject [ CompileAfter = (JetAPI.Generator.Deserializer, JetAPI.Generator.Serializer) ]
 {
 
-Parameter DeserializerClassName = {##class(ExtremeAPI.Generator.Deserializer).%ClassName(1)};
+Parameter DeserializerClassName = "JetAPI.Generator.Deserializer";
 
-Parameter SerializerClassName = {##class(ExtremeAPI.Generator.Serializer).%ClassName(1)};
+Parameter SerializerClassName = "JetAPI.Generator.Serializer";
 
 Parameter SerializedPrefix = "s0";
 
@@ -53,7 +53,6 @@ Method GenerateClassDefinition()
 
 Method GetClassMethods() As %ListOfObjects(ELEMENTTYPE="%Dictionary.MethodDefinition")
 {
-	s bannedMethods = $lb("%Call")
 	s methods = ##class(%ListOfObjects).%New()
 	
 	f
@@ -104,7 +103,7 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 	f i=1:1:$ll(cMethod.FormalSpecParsed) {
 		s arg = $lg(cMethod.FormalSpecParsed,i)
 		
-		d ##class(ExtremeAPI.Functions).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
+		d ##class(JetAPI.Util.Common).GetMethodArgInfo(arg,.argName,.dType,.dCollectionType)
 		
 		s dName = ..#DeserializedPrefix_argName
 		s deserializationSpecs = deserializationSpecs_$lb(dName)
@@ -118,14 +117,14 @@ Method ProcessMethodSpecs(cMethod As %Dictionary.CompiledMethod, ByRef methodImp
 		}
 		s serializationSpecs = serializationSpecs_$lb(sName_":"_sType)
 		
-		s code = ##class(ExtremeAPI.Generator.Deserializer).GetBlockCode(sName,dName,dType,dCollectionType)
+		s code = ##class(JetAPI.Generator.Deserializer).GetBlockCode(sName,dName,dType,dCollectionType)
 		s methodImpl = methodImpl_code_$c(13,10)
 	}
 }
 
 Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializationSpecs As %List, ByRef methodImpl As %String, ByRef returnType As %String)
 {
-	d ##class(ExtremeAPI.Functions).GetMethodReturnInfo(cMethod, .returnType, .collectionType)
+	d ##class(JetAPI.Util.Common).GetMethodReturnInfo(cMethod, .returnType, .collectionType)
 	
 	s isCollection = (collectionType '= "")
 	s callControllerMethod = "##class("_cMethod.Origin_")."_cMethod.Name_"("_$lts(deserializationSpecs)_")"
@@ -142,14 +141,14 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializatio
 		}
 		else
 		{
-			s returnType = ##class(ExtremeAPI.ObjectScriptType).#ListType
+			s returnType = ##class(JetAPI.Util.ObjectScriptType).#ListType
 		}
 		
 		s dResultVar = ..#DeserializedPrefix_"result"
 		s sResultVar = ..#SerializedPrefix_"result"
 		s condition = "("_dResultVar_" '= """")"
 		
-		s code = ##class(ExtremeAPI.Generator.Serializer).GetBlockCode(condition,sResultVar,dResultVar,returnType,isCollection)
+		s code = ##class(JetAPI.Generator.Serializer).GetBlockCode(condition,sResultVar,dResultVar,returnType,isCollection)
 		
 		s methodImpl = "	s "_dResultVar_" = "_callControllerMethod_$c(13,10)
 			_code_$c(13,10)
@@ -158,4 +157,3 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, deserializatio
 }
 
 }
-

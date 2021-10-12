@@ -1,6 +1,6 @@
-Include ExtremeAPI.general
+Include JetAPI.general
 
-Class ExtremeAPI.Generator.Java.Serializer Extends %RegisteredObject
+Class JetAPI.Generator.Java.Serializer Extends %RegisteredObject
 {
 
 Property SerializerVarName [ Private ];

@@ -1,11 +1,14 @@
-package io.github.martydashp.cache_extreme_api;
+package io.github.martydashp.cache_jet_api.dto;
 
-public final class RequestDTO implements AbstractDTO {
+import io.github.martydashp.cache_jet_api.Deserializer;
+import io.github.martydashp.cache_jet_api.Serializer;
+
+public final class Request implements AbstractDTO {
 
     String controllerName;
     String methodName;
 
-    RequestDTO(String controllerName, String methodName) {
+    public Request(String controllerName, String methodName) {
         this.controllerName = controllerName;
         this.methodName = methodName;
     }
