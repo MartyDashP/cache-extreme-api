@@ -1,8 +1,10 @@
-package io.github.martydashp.cache_jet_api;
+package io.github.martydashp.cache_jet_api.dto;
 
 import com.intersys.jdbc.CacheListReader;
+import io.github.martydashp.cache_jet_api.Deserializer;
+import io.github.martydashp.cache_jet_api.Serializer;
 
-public final class ResponseDTO implements AbstractDTO {
+public final class Response implements AbstractDTO {
 
     public static final String STATUS_OK = "ok";
     public static final String STATUS_EXCEPTION = "exception";
@@ -18,5 +20,13 @@ public final class ResponseDTO implements AbstractDTO {
 
     @Override
     public void serialize(Serializer serializer) {
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public CacheListReader getPayload() {
+        return payload;
     }
 }

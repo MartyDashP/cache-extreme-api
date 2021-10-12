@@ -9,7 +9,7 @@ Parameter APIDeserializer = "io.github.martydashp.cache_jet_api.Deserializer";
 
 Parameter APIConnection = "io.github.martydashp.cache_jet_api.Connection";
 
-Parameter APIAbstractDTO = "io.github.martydashp.cache_jet_api.AbstractDTO";
+Parameter APIAbstractDTO = "io.github.martydashp.cache_jet_api.dto.AbstractDTO";
 
 Parameter CacheListReader = "com.intersys.jdbc.CacheListReader";
 
