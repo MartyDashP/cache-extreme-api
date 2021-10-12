@@ -7,8 +7,6 @@ Property CompClass As %Dictionary.CompiledClass [ Private ];
 
 Property CompProperties [ MultiDimensional, Private ];
 
-Property ControllerName As %String [ Private ];
-
 Parameter SerializedPrefix = "b_";
 
 Parameter DeserializedPrefix = "_";
@@ -17,11 +15,10 @@ Parameter ConnectionVarName = "connection";
 
 Parameter SelfConnectionVarName = {"this."_..#ConnectionVarName};
 
-ClassMethod Generate(controllerName As %String, compClass As %Dictionary.CompiledClass) As JavaSpec.Model.Source
+ClassMethod Generate(compClass As %Dictionary.CompiledClass) As JavaSpec.Model.Source
 {
 	s generator = ..%New()
 	s generator.CompClass = compClass
-	s generator.ControllerName = controllerName
 	
 	$$$CollectSortedClassProperties(.compProperties,compClass)
 	m generator.CompProperties = compProperties
@@ -83,8 +80,8 @@ Method GetProperties() As %ListOfObjects(ELEMENTTYPE="JavaSpec.Model.Property")
 	s properties = ##class(%ListOfObjects).%New()
 	
 	s property = ##class(JavaSpec.Model.Property).%New()
-	s property.Name = "cacheClassName"
-	s property.InitValue = """"_..ControllerName_""""
+	s property.Name = "cacheControllerName"
+	s property.InitValue = """"_..CompClass.Name_""""
 	s property.Type = ##class(JavaSpec.Model.Type).SimpleType("String")
 	s property.Modifiers = ..GetModifiers($lb("private", "static", "final"))
 	$$$TOE(sc,properties.Insert(property))
@@ -113,7 +110,7 @@ Method GetMethods() As %ListOfObjects(ELEMENTTYPE="JavaSpec.Model.Method")
 		|| (cMethod.Internal = 1) 
 		|| (cMethod.Origin '= ..CompClass.Name)
 		|| (cMethod.ClassMethod = 0)
-		|| $lf(bannedMethods,cMethod.Name))
+		|| $MATCH(cMethod.Name,"^\%(jetApi).*"))
 		{
 			continue
 		}
@@ -202,7 +199,7 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, args As %List,
 	}
 	
 	s:(args '= "") args = ", "_$lts(args, ", ")
-	s methodImpl = ..#SelfConnectionVarName_".callMethod(cacheClassName,"""_cMethod.Name_""""_desCode_args_");"_$c(13,10)
+	s methodImpl = ..#SelfConnectionVarName_".invoke(cacheControllerName,"""_cMethod.Name_""""_desCode_args_");"_$c(13,10)
 	
 	if (desCode '= "")
 	{

@@ -3,7 +3,7 @@ Include JetAPI.general
 Class JetAPI.Util.Common Extends %RegisteredObject
 {
 
-Parameter BasicSupportedObjectClassName = "JetAPI.DTO.Abstract";
+Parameter BaseDTO = "JetAPI.DTO.Abstract";
 
 ClassMethod CollectSortedClassProperties(ByRef properties, comClass As %Dictionary.CompiledClass)
 {
@@ -70,7 +70,7 @@ ClassMethod IsDataTypeProperty(property As %Dictionary.CompiledProperty) As %Boo
 ClassMethod IsSupportedObjectType(className As %String) As %Boolean
 {
 	s compiledClass = ..GetCompiledClass(className)
-	ret ..IsExtendClass(compiledClass, ..#BasicSupportedObjectClassName)
+	ret ..IsExtendClass(compiledClass, ..#BaseDTO)
 }
 
 ClassMethod IsDataType(typeName As %String) As %Boolean
@@ -159,6 +159,16 @@ ClassMethod GetJavaDocClass(compClass As %Dictionary.CompiledClass) As %String
 	}
 	
 	ret javaDoc
+}
+
+ClassMethod GetCannonicalPath(path As %String) As %String
+{
+	if $$$isWINDOWS
+	{
+		ret $replace($tr(path, "\","/"),"//","/")
+	}
+
+	ret $replace($tr(path, "/","\"),"\\","\")
 }
 
 }

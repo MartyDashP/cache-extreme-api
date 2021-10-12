@@ -3,36 +3,32 @@ Include JetAPI.general
 Class JetAPI.Projection.JavaSpec Extends %Projection.AbstractProjection [ Abstract ]
 {
 
+Parameter TypeDTO = "dto";
+
+Parameter TypeController = "controller";
+
 Parameter TYPE;
-
-Parameter TARGETDIR;
-
-Parameter ROOTPACKAGENAME;
 
 ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, modified As %String, qstruct) As %Status
 {
+	s projectionType = $ZCONVERT($g(parameters("TYPE")),"L")
+	
 	#dim compClass as %Dictionary.CompiledClass
 	s compClass = $$$GetCompiledClass(classname)
 	
-	ret:compClass.Abstract $$$OK
+	ret:(compClass.Abstract || (projectionType = "")) $$$OK
 	
-	s type = ..GetParameter("TYPE", .parameters)
-	s fullFileName = ..GetFullFileName(compClass.Name, .parameters)
+	s source = $case(projectionType,
+		..#TypeDTO: ##class(JetAPI.Generator.Java.DTO).Generate(compClass),
+		..#TypeController: ##class(JetAPI.Generator.Java.Controller).Generate(compClass),
+		: "")
 		
-	if (type = "DTO")
-	{
-		s source = ##class(JetAPI.Generator.Java.DTO).Generate(compClass)
-	}
-	elseif (type = "Controller")
-	{
-		s controllerName = ..GetProjectionName(..GetParameter("ROOTPACKAGENAME", .parameters),compClass.Name)
-		s source = ##class(JetAPI.Generator.Java.Controller).Generate(controllerName, compClass)
-	}
+	s projectionFileName = ..GetProjectionFileName(compClass)
 	
-	if ($isObject(source) && (fullFileName '= ""))
+	if ($isObject(source) && (projectionFileName '= ""))
 	{
-		d ##class(JavaSpec.Writer).WriteSpec(source, fullFileName)
-		w !,"Java spec projection generated: "_fullFileName,!
+		d ##class(JavaSpec.Writer).WriteSpec(source, projectionFileName)
+		w !, "Java spec projection generated: "_projectionFileName, !
 	}
 	
 	ret $$$OK
@@ -48,42 +44,28 @@ ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, 
 		ret $$$OK
 	}
 	
-	s fullFileName = ..GetFullFileName(compClass.Name, .parameters)
-	s isSuccess = ##class(%File).Delete(fullFileName)
+	s projectionFileName = ..GetProjectionFileName(compClass)
 	
-	w:isSuccess !,"Java spec projection deleted: "_fullFileName,!
+	if (projectionFileName '= "")
+	{
+		s isSuccess = ##class(%File).Delete(fullFileName)
+		w:isSuccess !,"Java spec projection deleted: "_fullFileName,!
+	}
 	
 	ret $$$OK
 }
 
-ClassMethod GetParameter(name As %String, ByRef parameters) As %String
+ClassMethod GetProjectionFileName(compClass As %Dictionary.CompiledClass) As %String
 {
-	ret $g(parameters(name))
-}
-
-ClassMethod GetFullFileName(className As %String, ByRef parameters)
-{
-	s targetDir = ..GetParameter("TARGETDIR", .parameters)
-
-	if (targetDir = "")
+	s path = $classmethod(compClass.Name, "%jetApiJavaSpecProjectionTargetPath")
+	
+	if (path '= "")
 	{
-		throw ##class(%Exception.General).%New("Target dir for projection is undefined")
+		s path = path_"\"_compClass.Name_".xml"
+		s path = ##class(JetAPI.Util.Common).GetCannonicalPath(path)
 	}
 	
-	s fileName = className_".xml"
-	s fullFileName = targetDir_"\"_fileName
-	
-	if $$$isWINDOWS
-	{
-		ret $replace($tr(fullFileName, "\","/"),"//","/")
-	}
-
-	ret $replace($tr(fullFileName, "/","\"),"\\","\")
-}
-
-ClassMethod GetProjectionName(rootPackageName As %String, sourceClassName As %String) As %String
-{
-    ret $replace(rootPackageName_"."_sourceClassName,"..",".")
+	ret path
 }
 
 }
