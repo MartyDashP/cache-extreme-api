@@ -14,7 +14,7 @@ Property Data As %String;
 
 Property InnerException As %String;
 
-ClassMethod Create(ex As %Exception.AbstractException) As JetAPI.Exception.CacheException
+ClassMethod Create(ex As %Exception.AbstractException) As JetAPI.DTO.CacheException
 {
 	s cacheException = ..%New()
 	s cacheException.Name = ex.Name

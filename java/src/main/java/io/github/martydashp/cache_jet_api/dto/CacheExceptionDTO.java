@@ -3,7 +3,7 @@ package io.github.martydashp.cache_jet_api.dto;
 import io.github.martydashp.cache_jet_api.Deserializer;
 import io.github.martydashp.cache_jet_api.Serializer;
 
-public class CacheException implements AbstractDTO {
+public class CacheExceptionDTO implements AbstractDTO {
 
     String name;
     String code;
