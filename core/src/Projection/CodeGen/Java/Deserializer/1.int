@@ -1,0 +1,35 @@
+ROUTINE JetAPI.Projection.CodeGen.Java.Deserializer.1 [Type=INT,Generated]
+ ;JetAPI.Projection.CodeGen.Java.Deserializer.1
+ ;(C)InterSystems, generated for class JetAPI.Projection.CodeGen.Java.Deserializer.  Do NOT edit. 10/16/2021 10:09:32PM
+ ;;4C446848;JetAPI.Projection.CodeGen.Java.Deserializer
+ ;
+zGetCodeParameterDeserializatio(desVarName,attrInfo) public {
+	if attrInfo.IsList()
+	{
+		s subAttrInfo = attrInfo.Clone()
+		s subAttrInfo.CollectionType = ""
+		s subDesVarName = "_"_desVarName
+		ret desVarName_".getList("_subDesVarName_" -> "_..GetCodeParameterDeserialization(subDesVarName, subAttrInfo)_")"
+	}
+	if attrInfo.IsJetApiDTO()
+	{
+		ret desVarName_".getObject("_attrInfo.ElementType_".class)"
+	}
+	elseif attrInfo.IsDataType()
+	{
+		s class = ##class(JetAPI.Reflection.Type.Java).ToJavaClass(attrInfo.ElementType)
+		ret desVarName_".getValue("_class_")"
+	}
+	throw ##class(JetAPI.Exception.UnsupportedTypeException).Create(attrInfo)
+}
+zGetDeserializationScript(desVarName,compProperties) public {
+	s script = ""
+	f {
+		s key = $order(compProperties(key))
+	 	q:key=""
+	 	s compProperty = compProperties(key)
+	 	s propInfo = ##class(JetAPI.Reflection.Property).GetAttributeInfo(compProperty)
+	 	s propInfo.Alias = "this."_propInfo.Name
+	 	s script = script_propInfo.Alias_" = "_..GetCodeParameterDeserialization(desVarName, propInfo)_";"_$c(13,10)
+	}
+	ret script }
