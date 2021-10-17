@@ -3,72 +3,77 @@ Class JetAPI.Controller.Dispatcher Extends %RegisteredObject [ Abstract, Final ]
 
 Parameter DeviceIO = "%jetApiDeviceIO";
 
-ClassMethod %callMethodController(s0request As %List, args...) As JetAPI.DTO.Response [ Internal ]
+ClassMethod %invoke(s0request As %List, args...) As %List [ Internal ]
 {
+	#dim response as JetAPI.DTO.Response
 	try 
-	{
+	{	
 		#dim request as JetAPI.DTO.Request
 		s request = ##class(JetAPI.DTO.Request).%jetApiDeserializeDTO(s0request)
 		
 		s proxyControllerName = ##class(JetAPI.Projection.ProxyController).GetProxyControllerName(request.ControllerName)
 		s result = $classMethod(proxyControllerName, request.MethodName, args...)
 		
-		ret ##class(JetAPI.DTO.Response).Create(result)
+		s response = ##class(JetAPI.DTO.Response).Create(result)
+		s serializedResponse = response.%jetApiSerializeDTO()
 	}
 	catch ex
 	{
-		throw ##class(JetAPI.Exception.ConnectionException).Create(ex)
-	}
-}
-
-ClassMethod %invoke(s0request As %List, args...) As %List [ Internal ]
-{
-	try 
-	{		
-		s response = ..%callMethodController(s0request, args...)
-	}
-	catch connectionException
-	{
-		s response = ##class(JetAPI.DTO.Response).Create(connectionException)
-		s response.Status = response.#StatusException
+		s serializedResponse = ..%handleException(ex)
 	}
 
-	ret response.%jetApiSerializeDTO()
+	ret serializedResponse
 }
 
 ClassMethod %invokeStream(s0request As %List, args...) As %List [ Internal ]
 {
 	s @..#DeviceIO = $io
 	
+	#dim response as JetAPI.DTO.Response
 	try 
 	{		
-		d ..%callMethodController(s0request, args...)
+		#dim request as JetAPI.DTO.Request
+		s request = ##class(JetAPI.DTO.Request).%jetApiDeserializeDTO(s0request)
+		
+		s proxyControllerName = ##class(JetAPI.Projection.ProxyController).GetProxyControllerName(request.ControllerName)
+		d $classMethod(proxyControllerName, request.MethodName, args...)
+		
 		s response = ##class(JetAPI.DTO.Response).Create()
+		s serializedResponse = response.%jetApiSerializeDTO()
 	}
-	catch connectionException
+	catch ex
 	{
-		s response = ##class(JetAPI.DTO.Response).Create(connectionException)
-		s response.Status = response.#StatusException
+		s serializedResponse = ..%handleException(ex)
 	}
 	
 	k @..#DeviceIO
 	
+	ret serializedResponse
+}
+
+ClassMethod %handleException(exception As %Exception.AbstractException)
+{
+	s cacheException = ##class(JetAPI.DTO.CacheException).Create(exception)
+	s response = ##class(JetAPI.DTO.Response).Create(cacheException.%jetApiSerializeDTO())
+	s response.Status = response.#StatusException
+	
 	ret response.%jetApiSerializeDTO()
 }
 
-ClassMethod %sendStreamItem(payload, payloadType As %String = "")
+ClassMethod %sendStreamItem(payload, key As %String = "")
 {
 	s currentIO = $io
 	use @..#DeviceIO
 	
-	#dim item as JetAPI.DTO.Response
-	s item = ##class(JetAPI.DTO.Response).Create(payload)
-	s item.PayloadType = payloadType
-	s item.IsStream = 1
+	#dim response as JetAPI.DTO.Response
+	s response = ##class(JetAPI.DTO.Response).Create(payload)
+	s response.PayloadKey = key
+	s response.IsStream = 1
+	s serializedResponse = response.%jetApiSerializeDTO()
 	
-	w ..%getResponseHeader(item)
+	w ..%getResponseHeader(serializedResponse)
 	w $c(0,0)
-	w item.%jetApiSerializeDTO()
+	w serializedResponse
 	w !
 
 	use currentIO

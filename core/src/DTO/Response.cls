@@ -12,7 +12,7 @@ Property Status As %String;
 
 Property Payload As %List;
 
-Property PayloadType As %String;
+Property PayloadKey As %String;
 
 Property IsStream As %Boolean [ InitialExpression = 0 ];
 
@@ -25,19 +25,9 @@ ClassMethod Create(payload) As JetAPI.DTO.Response
 	ret response
 }
 
-ClassMethod CreateStreamResponse(payload, payloadType As %String)
-{
-	#dim response as JetAPI.DTO.Response
-	s response = ..Create(payload)
-	s response.PayloadType = payloadType
-	s response.IsStream = 1
-	
-	ret response
-}
-
 Method %jetApiSerializeDTO()
 {
- 	ret $lb(..Status, ..Payload, ..IsStream, ..PayloadType)
+ 	ret $lb(..Status, ..Payload, ..IsStream, ..PayloadKey)
 }
 
 ClassMethod %jetApiDeserializeDTO(sObj As %List) [ Internal ]

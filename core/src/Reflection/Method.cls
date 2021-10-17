@@ -30,15 +30,15 @@ ClassMethod GetReturnTypeParameters(parameters As %String) As JetAPI.Reflection.
 {
 	s typeInfo = ##class(JetAPI.Reflection.Model.Attribute).%New()
 	s typeParams = $lfs(parameters, ",")
-		
+
 	f i=1:1:$ll(typeParams)
 	{
 		s typeParam = $lfs($lg(typeParams,i),"=")
-			
+
 		if ($lg(typeParam, 1) = "COLLECTIONTYPE")
 		{
 			s collectionType = $tr($lg(typeParam, 2),"""","")
-			if (elementType '= "")
+			if (collectionType '= "")
 			{
 				s typeInfo.CollectionType = ##class(JetAPI.Reflection.Type.COS).Normalize(collectionType)
 			}
@@ -52,7 +52,7 @@ ClassMethod GetReturnTypeParameters(parameters As %String) As JetAPI.Reflection.
 			}
 		}
 	}
-	
+
 	ret typeInfo
 }
 

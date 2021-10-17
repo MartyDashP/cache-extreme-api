@@ -13,17 +13,12 @@ Property StreamType As %String;
 
 Method IsStream()
 {
-	ret ..StreamType '= ""
+	ret (..StreamType '= "")
 }
 
 Method IsCollection()
 {
-	ret ((..CollectionType '= "") && '..IsStream())
-}
-
-Method IsElement()
-{
-	ret ((..ElementType '= "") && '..IsCollection() && '..IsStream())
+	ret (..CollectionType '= "")
 }
 
 Method IsVoid()

@@ -11,8 +11,6 @@ Parameter List = "%Library.List";
 
 Parameter JetApiStream = "JetAPI.DataType.Stream";
 
-Parameter JetApiAnyStream = "JetAPI.DataType.AnyStream";
-
 Parameter JetApiAbstractDTO = "JetAPI.DTO.Abstract";
 
 ClassMethod Normalize(name As %String) As %String
@@ -39,7 +37,7 @@ ClassMethod IsLB(type As %String) As %Boolean
 
 ClassMethod IsStreamType(type As %String) As %Boolean
 {
-	s streams = $lb(..#JetApiStream, ..#JetApiAnyStream)
+	s streams = $lb(..#JetApiStream)
 	ret ($lf(streams, type) > 0)
 }
 

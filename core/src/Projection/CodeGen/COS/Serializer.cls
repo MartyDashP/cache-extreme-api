@@ -65,29 +65,26 @@ ClassMethod GetCodeParameterSerialization(source As JetAPI.Reflection.Model.Attr
  	{
 	 	throw ##class(JetAPI.Exception.UnsupportedTypeException).Create(attr)
  	}
-
- 	s args = args _ $lb(source.Alias)
-	s serializerClassName = ##class(JetAPI.Projection.CodeGen.COS.Serializer).%ClassName(1)
+		
+	if (##class(JetAPI.Reflection.Type.COS).IsList(source) 
+	|| ##class(JetAPI.Reflection.Type.COS).IsJetApiDto(source.ElementType))
+	{
+		s condition = "$isobject("_source.Alias_")"
+	}
+	elseif (##class(JetAPI.Reflection.Type.COS).IsDataType(source.ElementType)
+	|| ##class(JetAPI.Reflection.Type.COS).IsLB(source.ElementType))
+	{
+		s condition = "("_source.Alias_" '= """")"
+	}
+	else
+	{
+		throw ##class(JetAPI.Exception.UnsupportedTypeException).Create(source)
+	}
 	
+	s args = args _ $lb(source.Alias)
 	
-	
-	 if (##class(JetAPI.Reflection.Type.COS).IsList(source) 
-	 || ##class(JetAPI.Reflection.Type.COS).IsJetApiDto(source.ElementType))
-	 {
-		 s condition = "$isobject("_source.Alias_")"
-	 }
-	 elseif (##class(JetAPI.Reflection.Type.COS).IsDataType(source.ElementType)
-	 || ##class(JetAPI.Reflection.Type.COS).IsLB(source.ElementType))
-	 {
-		 s condition = "("_source.Alias_" '= """")"
-	 }
-	 else
-	 {
-		 throw ##class(JetAPI.Exception.UnsupportedTypeException).Create(source)
-	 }
- 	
  	ret "	if "_condition_" {"
- 		_" s "_target.Alias_" = ##class("_serializerClassName_").%Call("_$lts(args)_")"
+ 		_" s "_target.Alias_" = ##class("_##class(JetAPI.Converter.Serializer).%ClassName(1)_").%Call("_$lts(args)_")"
  		_" }"
 }
 

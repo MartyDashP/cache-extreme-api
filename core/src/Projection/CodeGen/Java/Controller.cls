@@ -13,6 +13,8 @@ Parameter SelfConnVarName = {"this."_..#ConnVarName};
 
 Parameter ControllerVarName = "cacheControllerName";
 
+Parameter StreamItemHandler = "streamItemHandler";
+
 ClassMethod CreateJavaSpec(compClass As %Dictionary.CompiledClass) As JavaSpec.Model.Source
 {
 	s codeGen = ..%New()
@@ -139,6 +141,38 @@ Method GetMethod(cMethod As %Dictionary.CompiledMethod) As JavaSpec.Model.Method
 	s method.ReturnType = ##class(JetAPI.Reflection.Type.Java).GetSpecType(methodInfo.ResultInfo)
 	s method.Parameters = ##class(%ListOfObjects).%New()
 	
+	if methodInfo.ResultInfo.IsStream()
+	{
+		s method.ReturnType = ##class(JavaSpec.Model.Type).%New()
+		s method.ReturnType.Name = "void"
+		
+		s parameter = ##class(JavaSpec.Model.Parameter).%New()
+		s parameter.Name = ..#StreamItemHandler
+		s parameter.Type = ##class(JavaSpec.Model.Type).%New()
+		s parameter.Type.Arguments = ##class(%ListOfObjects).%New()
+
+		if methodInfo.ResultInfo.IsVoid()
+		{
+			s parameter.Type.Name = ##class(JetAPI.Reflection.Type.Java).#BiConsumer
+			
+			s argType = ##class(JavaSpec.Model.Type).%New()
+			s argType.Name = "String"
+			$$$TOE(sc, parameter.Type.Arguments.Insert(argType))
+			
+			s argType = ##class(JavaSpec.Model.Type).%New()
+			s argType.Name = ##class(JetAPI.Reflection.Type.Java).#CacheListReader
+			$$$TOE(sc, parameter.Type.Arguments.Insert(argType))
+		}
+		else
+		{
+			s parameter.Type.Name = ##class(JetAPI.Reflection.Type.Java).#Consumer
+			s argType = ##class(JetAPI.Reflection.Type.Java).GetSpecType(methodInfo.ResultInfo)
+			$$$TOE(sc, parameter.Type.Arguments.Insert(argType))
+		}
+		
+		$$$TOE(sc, method.Parameters.Insert(parameter))
+	}
+	
 	f i=1:1:methodInfo.DesParamsInfo.Count()
 	{
 		#dim paramInfo as JetAPI.Reflection.Model.Attribute
@@ -204,12 +238,17 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, methodInfo As 
 	s methodName = "invoke"
 	s methodArgs = $lb(..#ControllerVarName, """"_cMethod.Name_"""")
 	
-	if ('resultInfo.IsVoid() && 'resultInfo.IsStream())
+	if (resultInfo.IsStream())
+	{
+		s streamItemHandler = ..#StreamItemHandler
+		s methodArgs = methodArgs_$lb(streamItemHandler)
+	}
+	
+	if ('resultInfo.IsVoid())
 	{
 		s desVarName = "d"
-		s lambda = desVarName
-			_" -> "
-			_##class(JetAPI.Projection.CodeGen.Java.Deserializer).GetCodeParameterDeserialization(desVarName, resultInfo)
+		s desCode = ##class(JetAPI.Projection.CodeGen.Java.Deserializer).GetCodeParameterDeserialization(desVarName, resultInfo)
+		s lambda = desVarName_" -> "_desCode
 			
 		s methodArgs = methodArgs_$lb(lambda)
 	}
@@ -221,7 +260,7 @@ Method ProcessMethodResult(cMethod As %Dictionary.CompiledMethod, methodInfo As 
 		s methodArgs = methodArgs_$lb(paramInfo.Alias)
 	}
 	
-	s cmd = ..#SelfConnVarName_"."_methodName_"("_$lts(methodArgs, ", ")_");"
+	s cmd = ..#SelfConnVarName_".invoke("_$lts(methodArgs, ", ")_");"
 	
 	if ('resultInfo.IsVoid() && 'resultInfo.IsStream())
 	{

@@ -70,10 +70,8 @@ ClassMethod GetCodeParameterDeserialization(source As JetAPI.Reflection.Model.At
 	 	throw ##class(JetAPI.Exception.UnsupportedTypeException).Create(target)
  	}
  	
- 	s deserializerClassName = ##class(JetAPI.Projection.CodeGen.COS.Deserializer).%ClassName(1)
- 	
  	ret "	if ("_source.Alias_" '= """") {"
- 		_" s "_target.Alias_" = ##class("_deserializerClassName_").%Call("_$lts(args)_")"
+ 		_" s "_target.Alias_" = ##class("_##class(JetAPI.Converter.Deserializer).%ClassName(1)_").%Call("_$lts(args)_")"
 		_" }"
 }
 

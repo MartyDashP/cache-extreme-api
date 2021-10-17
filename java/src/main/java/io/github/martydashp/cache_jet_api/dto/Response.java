@@ -11,7 +11,7 @@ public final class Response implements AbstractDTO {
 
     String status;
     boolean isStream;
-    String payloadType;
+    String payloadKey;
     CacheListReader payload;
 
     @Override
@@ -19,7 +19,7 @@ public final class Response implements AbstractDTO {
         status = deserializer.getValue(String.class);
         payload = deserializer.getCacheList();
         isStream = deserializer.getValue(Boolean.class);
-        payloadType = deserializer.getValue(String.class);
+        payloadKey = deserializer.getValue(String.class);
     }
 
     @Override
@@ -34,8 +34,8 @@ public final class Response implements AbstractDTO {
         return isStream;
     }
 
-    public String getPayloadType() {
-        return payloadType;
+    public String getPayloadKey() {
+        return payloadKey;
     }
 
     public CacheListReader getPayload() {

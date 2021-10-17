@@ -13,6 +13,10 @@ Parameter CacheListReader = "com.intersys.jdbc.CacheListReader";
 
 Parameter UtilList = "java.util.List";
 
+Parameter BiConsumer = "java.util.function.BiConsumer";
+
+Parameter Consumer = "java.util.function.Consumer";
+
 ClassMethod GetSpecType(info As JetAPI.Reflection.Model.Attribute) As JavaSpec.Model.Type
 {
 	s javaType = ##class(JavaSpec.Model.Type).%New()
