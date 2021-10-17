@@ -6,12 +6,12 @@ Class JetAPI.Projection.ProxyController Extends %Projection.AbstractProjection [
 ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, modified As %String, qstruct) As %Status
 {
 	#dim compClass as %Dictionary.CompiledClass
-	s compClass = $$$GetCompiledClass(classname)
+	s compClass = ##class(JetAPI.Reflection.Class).GetCompiledClass(classname)
 	
 	ret:(compClass.Abstract) $$$OK
 	
 	s proxyName = ..GetProxyControllerName(compClass.Name)
-	$$$TOE(sc, ##class(JetAPI.Generator.ProxyController).Generate(compClass, proxyName))
+	$$$TOE(sc, ##class(JetAPI.Projection.CodeGen.COS.ProxyController).CreateProxyController(compClass, proxyName))
 	
 	w !,"Jet API proxy controller generated: "_proxyName,!
 	
@@ -21,7 +21,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
 {
 	#dim compClass as %Dictionary.CompiledClass
-	s compClass = $$$GetCompiledClass(classname)
+	s compClass = ##class(JetAPI.Reflection.Class).GetCompiledClass(classname)
 	s proxyName = ..GetProxyControllerName(compClass.Name)
 	
 	ret:(proxyName '= "") $$Delete^%apiOBJ(proxyName,"-d",,1)

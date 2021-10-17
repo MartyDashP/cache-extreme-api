@@ -1,10 +1,10 @@
 Class JetAPI.Exception.UnsupportedTypeException Extends %Exception.General
 {
 
-Method %OnNew(type As %String) As %Status [ Private ]
+ClassMethod Create(attr As JetAPI.Reflection.Model.Attribute)
 {
-	s cause = "Jet API unsupported type '"_type_"'"
-	ret ##super("<UNSUPPORTED_TYPE>", "", "", cause, "")
+	s cause = "Jet API unsupported type '"_attr.ToString()_"'"
+	ret ..%New("<UNSUPPORTED_TYPE>", "", "", cause, "")
 }
 
 }

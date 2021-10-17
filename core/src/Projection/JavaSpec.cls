@@ -14,13 +14,13 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 	s projectionType = $ZCONVERT($g(parameters("TYPE")),"L")
 	
 	#dim compClass as %Dictionary.CompiledClass
-	s compClass = $$$GetCompiledClass(classname)
+	s compClass = ##class(JetAPI.Reflection.Class).GetCompiledClass(classname)
 	
 	ret:(compClass.Abstract || (projectionType = "")) $$$OK
 	
 	s source = $case(projectionType,
-		..#TypeDTO: ##class(JetAPI.Generator.Java.DTO).Generate(compClass),
-		..#TypeController: ##class(JetAPI.Generator.Java.Controller).Generate(compClass),
+		..#TypeDTO: ##class(JetAPI.Projection.CodeGen.Java.DTO).CreateJavaSpec(compClass),
+		..#TypeController: ##class(JetAPI.Projection.CodeGen.Java.Controller).CreateJavaSpec(compClass),
 		: "")
 		
 	s projectionFileName = ..GetProjectionFileName(compClass)
@@ -37,7 +37,7 @@ ClassMethod CreateProjection(classname As %String, ByRef parameters As %String, 
 ClassMethod RemoveProjection(classname As %String, ByRef parameters As %String, recompile As %Boolean, modified As %String, qstruct) As %Status
 {
 	#dim compClass as %Dictionary.CompiledClass
-	s compClass = ##class(JetAPI.Util.Common).GetCompiledClass(classname)
+	s compClass = ##class(JetAPI.Reflection.Class).GetCompiledClass(classname)
 	
 	if ('$isObject(compClass) || compClass.Abstract)
 	{
@@ -62,7 +62,7 @@ ClassMethod GetProjectionFileName(compClass As %Dictionary.CompiledClass) As %St
 	if (path '= "")
 	{
 		s path = path_"\"_compClass.Name_".xml"
-		s path = ##class(JetAPI.Util.Common).GetCannonicalPath(path)
+		s path = ##class(JetAPI.Util.General).GetCannonicalPath(path)
 	}
 	
 	ret path
