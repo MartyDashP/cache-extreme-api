@@ -60,9 +60,10 @@ public class Deserializer {
 
             final CacheListReader subReader = reader.getInnerList();
             final List<T> listDTO = new ArrayList<>();
+            final int count = subReader.count();
             final Deserializer d = new Deserializer(subReader);
 
-            for (int i = 0; i < subReader.getLength(); i++) {
+            for (int i = 0; i < count; i++) {
                 T item = func.apply(d);
                 listDTO.add(item);
             }
