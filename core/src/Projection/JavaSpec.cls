@@ -61,6 +61,11 @@ ClassMethod GetProjectionFileName(compClass As %Dictionary.CompiledClass) As %St
 	
 	if (path '= "")
 	{
+		if '##class(%Library.File).DirectoryExists(path)
+		{
+			d ##class(%Library.File).CreateDirectoryChain(path)
+		}
+		
 		s path = path_"\"_compClass.Name_".xml"
 		s path = ##class(JetAPI.Util.General).GetCannonicalPath(path)
 	}
